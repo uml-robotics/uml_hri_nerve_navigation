@@ -1,0 +1,58 @@
+<!-- Assumes Gazebo is already running -->
+<launch>
+  <!-- This launch file includes all the nodes needed to setup a simulated fetch for navigation -->
+
+  <!-- Settings (Args are usually overidden by robot launch files)-->
+  <arg name="x" default="0.0" />
+  <arg name="y" default="0.0" />
+  <arg name="z" default="0.1" />
+  <arg name="yaw" default="0.0" /> <!-- Rotation in radians. -->
+  <arg name="level" default="level1" />
+  <arg name="navigate" default="true" />
+  <arg name="3d" default="true" />
+
+  <!-- robot determines the topics to be published, and serves as a identifier for Gazebo -->
+  <arg name="robot" value="fetch" />
+
+  <!-- Robot topics and links -->
+  <arg name="laser_topic" value="/base_scan" />
+  <arg name="pointcloud_topic" value="/head_camera/depth_downsample/points" />
+  <arg name="cmd_vel_topic" value="cmd_vel" />
+  <arg name="odom_topic" value="odom" />
+  <arg name="odom_link" value="odom"/>
+  <arg name="base_link" value="base_link" />
+
+  <node pkg="fetch_navigation" type="tilt_head.py" name="tilt_head_node" />
+
+  <!-- Start Kinect to Laser Converter -->
+  <!-- <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pcl_to_laser.launch">
+    <arg name="robot" value="" />
+  </include> -->
+
+  <!-- Start pointcloud filter-->
+  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pointcloud_filter.launch">
+    <arg name="namespace" value="" />
+    <arg name="input_cloud" value="$(arg pointcloud_topic)" />
+    <arg name="output_cloud" value="$(arg pointcloud_topic)_filtered" />
+  </include>
+
+  <!-- Setup nav stack-->
+  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/setup_navigation.launch">
+    <arg name="robot" value="$(arg robot)"/>
+    <arg name="namespace" value="" />
+    <arg name="x" value="$(arg x)" />
+    <arg name="y" value="$(arg y)" />
+    <arg name="z" value="$(arg z)" />
+    <arg name="yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
+    <arg name="level" value="$(arg level)" />
+    <arg name="navigate" value="$(arg navigate)" />
+    <arg name="3d" value="$(arg 3d)" />
+    <arg name="laser_topic" value="$(arg laser_topic)" />
+    <arg name="pointcloud_topic" value="$(arg pointcloud_topic)_filtered" />
+    <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="odom_link" value="$(arg odom_link)"/>
+    <arg name="base_link" value="$(arg base_link)" />
+  </include>
+
+</launch>

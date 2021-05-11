@@ -1,0 +1,32 @@
+<launch>
+  <!-- This launch file runs the custom mover and logger nodes and causes the robot to start navigating.  The code for the nodes
+  can be found at src/mover.cpp and src/referee.cpp.  The mover node will read from the goal topic and cause the robot to start 
+  moving between goals A and B for a specified number of iterations. The logger node will publish a custom topic that contains
+  important robot log data.  -->
+
+  <arg name="namespace" default="" />
+  <arg name="iterations" default="1" />
+  <arg name="clear_costmaps" default="true" />
+
+  <!-- Start moving-->
+  <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" required="true" if="$(eval not namespace)">
+    <param name="iterations" value="$(arg iterations)" />
+    <param name="clear_costmaps" value="$(arg clear_costmaps)" />
+  </node>
+
+  <!-- Start moving with namespace-->
+  <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" ns="$(arg namespace)" required="true" unless="$(eval not namespace)">
+    <param name="iterations" value="$(arg iterations)" />
+  </node>
+
+  <!-- Start logging the movement-->
+  <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen" if="$(eval not namespace)">
+    <remap from="odom" to="base_pose_ground_truth" />
+  </node>
+
+  <!-- Start logging the movement with namespace-->
+  <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" ns="$(arg namespace)" output="screen" unless="$(eval not namespace)">
+    <remap from="odom" to="base_pose_ground_truth" />
+  </node>
+
+</launch>

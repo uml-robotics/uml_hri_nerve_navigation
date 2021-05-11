@@ -1,0 +1,12 @@
+<launch>
+    <!-- This launch file launches the save_maps.sh bash script.  The script creates a new folder for the maps
+    to live following the static_maps folder structure and saves the maps from map_server and octomap_server. -->
+
+    <arg name="map_name" default="level1"/>
+    <arg name="2d" default="true" />
+    <arg name="3d" default="true" />
+
+    <!-- Launch the save_maps bash script-->
+    <node pkg="uml_hri_nerve_navigation" type="save_maps.sh" name="map_saver_script" args="$(arg map_name) $(arg 2d) $(arg 3d)"/>
+    
+</launch>

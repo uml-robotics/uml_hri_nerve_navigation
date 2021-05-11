@@ -1,0 +1,10 @@
+<launch>
+    <arg name="config_file" default="config" />
+    <arg name="robot" default="" />
+
+    <!-- Launch rviz using the default config file -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find uml_hri_nerve_navigation)/resources/config/rviz_default/$(arg config_file).rviz" if="$(eval not robot)"/>
+
+    <!-- Launch rviz using a robot specific config file -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/$(arg config_file).rviz" unless="$(eval not robot)"/>
+</launch>

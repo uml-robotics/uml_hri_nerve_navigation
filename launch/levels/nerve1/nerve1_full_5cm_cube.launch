@@ -1,0 +1,70 @@
+<launch>
+  <!-- This launch file includes the setup_test launch file and sets the parameters needed to launch
+  the nerve1_base_world world. -->
+
+  <!-- Determine whether the robot is physical or simulated-->
+  <arg name="sim" default="true" />
+
+  <!-- If in sim, enable gazebo gui or not -->
+  <arg name="gui" default="true" />
+
+  <!-- Launch in either navigate mode or mapping mode -->
+  <arg name="navigate" default="true" />
+
+  <!-- Use 3d or 2d navigation -->
+  <arg name="3d" default="true" />
+  
+  <!-- Name and type of robot being spawned in -->
+  <arg name="robot" default="fetch" />
+
+  <!-- Define the two goal points on the map-->
+  <arg name="spawn_x" value="0.0" />
+  <arg name="spawn_y" value="4.0" />
+  <arg name="spawn_z" value="0.0" />
+  <arg name="spawn_yaw" value="0.0" />
+
+  <arg name="goal_x" value="0.0" />
+  <arg name="goal_y" value="8.0" />
+  <arg name="goal_z" default="0"/>
+  <arg name="goal_yaw" default="0"/>
+
+  <!-- Define map settings-->
+  <arg name="world_name" value="nerve1_full_5cm_cube" />
+  <arg name="world_path" value="nerve1/$(arg world_name)" />
+  
+  <!-- Determine whether an obstacle robot should be spawned in -->
+  <arg name="obstacle_bot" default="false" />
+  
+  <!-- Determine whether a dynamic obstacle should be spawned in -->
+  <arg name="dynamic_obstacle" default="false" />
+
+  <!-- Name of dynamic obstacle that will be spawned in if needed -->
+  <arg name="obstacle_name" default="caution_100cm_block" />
+
+  <!-- Flip obstacle spawner -->
+  <arg name="flip_obstacle" default="false" />
+
+  <!-- Set up the test -->
+  <include file="$(find uml_hri_nerve_navigation)/launch/setup_test.launch">
+    <arg name="sim" value="$(arg sim)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="navigate" value="$(arg navigate)" />
+    <arg name="3d" value="$(arg 3d)" />
+    <arg name="robot" value="$(arg robot)" />
+    <arg name="spawn_x" value="$(arg spawn_x)" />
+    <arg name="spawn_y" value="$(arg spawn_y)" />
+    <arg name="spawn_z" value="$(arg spawn_z)" />
+    <arg name="spawn_yaw" value="$(arg spawn_yaw)" />
+    <arg name="goal_x" value="$(arg goal_x)" />
+    <arg name="goal_y" value="$(arg goal_y)" />
+    <arg name="goal_z" value="$(arg goal_z)" />
+    <arg name="goal_yaw" value="$(arg goal_yaw)" />
+    <arg name="world_name" value="$(arg world_name)" />
+    <arg name="world_path" value="$(arg world_path)" />
+    <arg name="obstacle_bot" value="$(arg obstacle_bot)" />
+    <arg name="dynamic_obstacle" value="$(arg dynamic_obstacle)" />
+    <arg name="obstacle_name" value="$(arg obstacle_name)" />
+    <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
+  </include>
+
+</launch>

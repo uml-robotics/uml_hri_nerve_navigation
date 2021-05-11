@@ -1,0 +1,85 @@
+<launch>
+    <!-- Navigation parameters, most of these are overridden by the robot launch files -->
+
+    <!-- type of robot being used -->
+    <arg name="robot" />
+
+    <!-- Robot namespace -->
+    <arg name="namespace" default="" />
+
+    <!-- Spawn location of amcl initialization -->
+    <arg name="x" default="0.0" />
+    <arg name="y" default="0.0" />
+    <arg name="z" default="0.1" />
+    <arg name="yaw" default="0.0" /> <!-- Rotation in radians. -->
+
+    <!-- Environment that is being navigated in -->
+    <arg name="level" default="level1" />
+
+    <!-- Launch in navigate mode or mapping mode -->
+    <arg name="navigate" default="true" />
+
+    <!-- Use 3d sensor navigation or 2d sensor naviagtion -->
+    <arg name="3d" default="true" />
+
+    <!-- Robot topics and links -->
+    <arg name="laser_topic" default="/base_scan" />
+    <arg name="pointcloud_topic" default="/head_camera/depth_downsample/points" />
+    <arg name="cmd_vel_topic" default="cmd_vel" />
+    <arg name="odom_topic" default="odom" />
+    <arg name="odom_link" default="odom"/>
+    <arg name="base_link" default="base_link" />
+
+    <!-- Start nav stack or mapping mode-->
+    <group if="$(arg navigate)">
+      <!-- Start 3d Nav Stack if 3d = true -->
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_3d.launch" if="$(arg 3d)">
+        <arg name="namespace" value="$(arg namespace)" />
+        <arg name="robot_type" value="$(arg robot)" />
+        <arg name="map" value="$(arg level)" />
+        <arg name="init_x" value="$(arg x)" />
+        <arg name="init_y" value="$(arg y)" />
+        <arg name="init_yaw" value="$(arg yaw)" />
+        <arg name="has_laser" value="true" />
+        <arg name="laser_topic" value="$(arg laser_topic)" />
+        <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />
+        <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+        <arg name="odom_topic" value="$(arg odom_topic)" />
+        <arg name="odom_link" value="$(arg odom_link)"/>
+        <arg name="base_link" value="$(arg base_link)" />
+      </include>
+    
+      <!-- Start 2d Nav Stack if 3d = false -->
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_2d.launch" unless="$(arg 3d)">
+      <arg name="namespace" value="" />
+        <arg name="robot_type" value="$(arg robot)" />
+        <arg name="map" value="$(arg level)" />
+        <arg name="init_x" value="$(arg x)" />
+        <arg name="init_y" value="$(arg y)" />
+        <arg name="init_yaw" value="$(arg yaw)" />
+        <arg name="laser_topic" value="$(arg laser_topic)" />
+        <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+        <arg name="odom_topic" value="$(arg odom_topic)" />
+        <arg name="odom_link" value="$(arg odom_link)"/>
+        <arg name="base_link" value="$(arg base_link)" />
+      </include>
+  </group>
+    
+  <group unless="$(arg navigate)">
+    <!-- Start Mapping -->
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/map_teleop.launch">
+      <arg name="namespace" value="" />
+      <arg name="map" value="$(arg level)" />
+      <arg name="3d" value="$(arg 3d)" />
+      <arg name="init_x" value="$(arg x)" />
+      <arg name="init_y" value="$(arg y)" />
+      <arg name="init_yaw" value="$(arg yaw)" />
+      <arg name="laser_topic" value="$(arg laser_topic)" />
+      <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_link" value="$(arg odom_link)"/>
+      <arg name="base_link" value="$(arg base_link)" />
+    </include>
+  </group>
+    
+</launch>

@@ -1,0 +1,12 @@
+<launch>
+  <!-- Doc: http://wiki.ros.org/pointcloud_to_laserscan?distro=kinetic -->
+
+  <arg name="robot" default="pioneer"/>
+  <arg name="pointcloud_topic" />
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_scan">
+    <remap from="cloud_in" to="$(arg pointcloud_topic)"/>
+    <remap from="scan" to="pointcloud_scan"/>
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/pc_to_laser_config.yaml" command="load"/>
+  </node>
+</launch>

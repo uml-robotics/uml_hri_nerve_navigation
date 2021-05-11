@@ -1,0 +1,54 @@
+<launch>
+    <!-- The map_teleop launch file includes all of the launch files needed for a robot to map an environment.  
+    The nodes needed for both 2D and 3D mapping are gmapping and octomap_server.  Also this launch file launches 
+    the teleop_twist_keyboard which allows a user to drive the robot around with a keyboard.-->
+
+    <!-- Settings -->
+    <arg name="namespace" default="" />
+    <!-- Map Name-->
+    <arg name="map" default="level1" />
+    <!-- Boolean for whether a 2d map is already present-->
+    <arg name="static_2d_map" default="false" />
+    <!-- Boolean for whether 3d mapping is necessary-->
+    <arg name="3d" default="true" />
+
+    <!-- Initial orientation for AMCL node. (Should be set to match robot spawn position).  Used only when static 2d maps are used -->
+    <arg name="init_x" default="0.0" />
+    <arg name="init_y" default="0.0" />
+    <arg name="init_yaw" default="0.0" /> <!-- Radians -->
+
+    <!-- Robot sensor topic Mapping-->
+    <arg name="laser_topic" />
+    <arg name="pointcloud_topic" />
+    <arg name="cmd_vel_topic" />
+    <arg name="odom_link" />
+    <arg name="base_link" />
+
+    <!-- Start gmapping-->
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch">
+        <arg name="namespace" value="$(arg namespace)" />
+        <arg name="scan_topic" value="$(arg laser_topic)" />
+        <arg name="odom_link" value="$(arg odom_link)" />
+        <arg name="base_link" value="$(arg base_link)" />
+    </include>
+
+    <!-- Start octomap_server if 3d mapping also needs to be done-->
+    <group if="$(arg 3d)">
+        <include file="$(find uml_hri_nerve_navigation)/launch/navigation/octomap_mapper.launch">
+            <arg name="robot" value="$(arg namespace)" />
+            <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />
+            <arg name="base_link" value="$(arg base_link)" />
+        </include>
+    </group>
+
+    <!-- Start keyboard teleop node -->
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop" output="screen" if="$(eval not namespace)">
+        <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />
+    </node>
+
+    <!-- Start keyboard teleop node with namespace-->
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop" output="screen" ns="$(arg namespace)" unless="$(eval not namespace)">
+        <remap from="cmd_vel" to="$(arg cmd_vel_topic)" />
+    </node>
+
+</launch>

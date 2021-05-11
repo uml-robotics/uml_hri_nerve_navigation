@@ -1,0 +1,35 @@
+<launch>
+  <!-- Docs: https://wiki.ros.org/pcl_ros/Tutorials/filters -->
+
+  <!-- remapping args-->
+  <arg name="namespace" default="" />
+  <arg name="input_cloud" default="/head_camera/depth_downsample/points" />
+  <arg name="output_cloud" default="$(arg input_cloud)_filtered" />
+  
+  <!-- Run the filter without a namespace if a namespace is not specified -->
+  <group if="$(eval not namespace)">
+    <!-- Run a passthrough filter to clean the input pointcloud -->
+    <node pkg="nodelet" type="nodelet" name="outlier_removal" args="standalone pcl/StatisticalOutlierRemoval">
+      <remap from="~input" to="$(arg input_cloud)" />
+      <remap from="~output" to="$(arg output_cloud)" />
+      <rosparam>
+        mean_k: 50
+        stddev: 3.5
+      </rosparam>
+    </node>
+  </group>
+
+  <!-- Run the filter with a namespace if a namespace is specified -->
+  <group unless="$(eval not namespace)" ns="$(arg namespace)">
+    <!-- Run a passthrough filter to clean the input pointcloud -->
+    <node pkg="nodelet" type="nodelet" name="outlier_removal" args="standalone pcl/StatisticalOutlierRemoval">
+      <remap from="~input" to="$(arg input_cloud)" />
+      <remap from="~output" to="$(arg output_cloud)" />
+      <rosparam>
+        mean_k: 50
+        stddev: 3.5
+      </rosparam>
+    </node>
+  </group>
+  
+</launch>

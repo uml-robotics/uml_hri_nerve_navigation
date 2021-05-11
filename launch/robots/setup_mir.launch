@@ -1,0 +1,64 @@
+<!-- Assumes Gazebo is already running -->
+<launch>
+    <!-- This launch file includes all the nodes needed to setup a simulated MiR100 for navigation -->
+
+    <!-- Settings (Robot position args are overidden by spawn_world.launch)-->
+    <arg name="x" default="0.0" />
+    <arg name="y" default="0.0" />
+    <arg name="z" default="0.1" />
+    <arg name="yaw" default="0.0" /> <!-- Rotation in radians. -->
+    <arg name="level" default="level1" />
+    <arg name="navigate" default="true" />
+    <arg name="3d" default="false" />
+  
+    <!-- robot determines the topics to be published, and serves as a identifier for Gazebo -->
+    <arg name="robot" value="mir" />
+  
+    <!-- Robot sensor topics -->
+    <arg name="laser_topic" value="/scan_filtered" />
+    <arg name="pointcloud_topic" value="" />
+    <arg name="cmd_vel_topic" value="mobile_base_controller/cmd_vel" />
+    <arg name="odom_topic" value="mobile_base_controller/odom" />
+    <arg name="odom_link" value="odom"/>
+    <arg name="base_link" value="base_link" />
+  
+    <!-- Laser filter to remove infinite values from the front facing laser -->
+    <!-- http://wiki.ros.org/laser_filters -->
+    <!-- <node name="laser_filter" pkg="laser_filters" type="scan_to_scan_filter_chain" >
+      <rosparam command="load" file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/laserfilter_config.yaml" />
+      <remap from="scan" to="frontscan" />
+      <remap from="scan_filtered" to="frontscan_filtered" />
+    </node> -->
+  
+    <!-- Start Kinect to Laser Converter -->
+    <!-- <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pcl_to_laser.launch">
+      <arg name="robot" value="" />
+    </include> -->
+  
+    <!-- Start pointcloud filter-->
+    <!-- <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pointcloud_filter.launch">
+      <arg name="namespace" value="" />
+      <arg name="input_cloud" value="$(arg pointcloud_topic)" />
+      <arg name="output_cloud" value="$(arg pointcloud_topic)_filtered" />
+    </include> -->
+  
+    <!-- Setup nav stack-->
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/setup_navigation.launch">
+      <arg name="robot" value="$(arg robot)"/>
+      <arg name="namespace" value="" />
+      <arg name="x" value="$(arg x)" />
+      <arg name="y" value="$(arg y)" />
+      <arg name="z" value="$(arg z)" />
+      <arg name="yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
+      <arg name="level" value="$(arg level)" />
+      <arg name="navigate" value="$(arg navigate)" />
+      <arg name="3d" value="$(arg 3d)" />
+      <arg name="laser_topic" value="$(arg laser_topic)" />
+      <arg name="pointcloud_topic" value="$(arg pointcloud_topic)_filtered" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_topic" value="$(arg odom_topic)" />
+      <arg name="odom_link" value="$(arg odom_link)"/>
+      <arg name="base_link" value="$(arg base_link)" />
+    </include>
+  
+  </launch>

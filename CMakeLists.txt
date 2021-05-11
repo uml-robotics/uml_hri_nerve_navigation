@@ -2,15 +2,22 @@ cmake_minimum_required(VERSION 3.0.2)
 project(uml_hri_nerve_navigation)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  gazebo_ros
   roscpp
-  rospy
   std_msgs
+  std_srvs
+  geometry_msgs
+  tf2
+  message_generation
+  move_base_msgs
+  actionlib
+  gazebo_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -47,11 +54,10 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+    FILES
+    SimLog.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -68,10 +74,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -105,7 +112,16 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES uml_hri_nerve_navigation
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+   CATKIN_DEPENDS 
+    gazebo_ros 
+    roscpp 
+    std_msgs 
+    std_srvs 
+    geometry_msgs 
+    message_runtime 
+    move_base_msgs 
+    actionlib 
+    gazebo_msgs
 #  DEPENDS system_lib
 )
 
@@ -134,6 +150,11 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/uml_hri_nerve_navigation_node.cpp)
+add_executable(mover_node src/mover.cpp)
+add_executable(goal_publisher src/goal_pub.cpp)
+add_executable(obstacle_bot_node src/obstacle_bot.cpp)
+add_executable(logger src/logger.cpp)
+add_executable(estop src/estop.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -144,11 +165,31 @@ include_directories(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(mover_node ${mover_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(goal_publisher ${goal_publisher_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(obstacle_bot_node ${obstacle_bot_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(logger ${logger_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(estop ${estop_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(mover_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(goal_publisher
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(obstacle_bot_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(logger
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(estop
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
