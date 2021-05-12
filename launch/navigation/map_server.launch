@@ -5,5 +5,5 @@
 
   <!-- launch map server -->
 	<node name="map_server" pkg="map_server" type="map_server"
-        args="$(find uml_hri_nerve_navigation)/resources/static_maps/2d/$(arg map_name)/$(arg map_name).yaml"/>
+        args="$(find uml_hri_nerve_navigation)/resources/static_maps/2d/$(arg map_name).yaml"/>
 </launch>

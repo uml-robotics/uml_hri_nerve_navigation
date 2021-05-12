@@ -7,7 +7,7 @@
 
   <!-- launch server for positive map-->
   <node pkg="octomap_server" type="octomap_server_node" name="octomap_server"
-    args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map)/$(arg map).bt">
+    args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map).bt">
     <remap from="cloud_in" to="pointcloud_static_octomap_ignore" />
     <param name="base_frame_id" value="$(arg base_link)" />
     <param name="frame_id" type="string" value="/map" />
@@ -17,7 +17,7 @@
 
   <!-- launch server for negative map-->
   <node pkg="octomap_server" type="octomap_server_node" name="octomap_server_negative"
-    args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map)/$(arg map).bt">
+    args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map).bt">
     <remap from="cloud_in" to="pointcloud_static_octomap_ignore" />
     <param name="base_frame_id" value="$(arg base_link)" />
     <param name="frame_id" type="string" value="/map" />

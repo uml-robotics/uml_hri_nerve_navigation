@@ -6,6 +6,7 @@
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <gazebo_msgs/ContactsState.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <string>
@@ -49,6 +50,7 @@ private:
     uint goals_aborted;
     bool navigating;
     bool publishing;
+    bool test_active;
 
 public:
     Logger(ros::NodeHandle n)
@@ -67,6 +69,7 @@ public:
         goals_aborted = 0;
         navigating = false;
         publishing = false;
+        test_active = false;
 
         log.collision.x = -100000;
         log.collision.y = -100000;
@@ -76,7 +79,7 @@ public:
 
     void add_position(geometry_msgs::PoseWithCovarianceStamped pose)
     {
-        if (navigating)
+        if (navigating && test_active)
         {
             //save the position and distance
             log.robot_pos.x = pose.pose.pose.position.x;
@@ -97,7 +100,7 @@ public:
 
     void add_collision(gazebo_msgs::ContactsState collision)
     {
-        if (navigating && !collision.states.empty())
+        if (navigating && !collision.states.empty() && test_active)
         {
             //Filters out collisions that are right next to each other
             if (iteration_collision != 0 && std::abs(collision.states[0].contact_positions[0].x - collision_x < collision_thres) && std::abs(collision.states[0].contact_positions[0].y - collision_y < collision_thres))
@@ -132,7 +135,7 @@ public:
 
     void add_nav_result(bool goal_reached)
     {
-        if (navigating)
+        if (navigating && test_active)
         {
             //Change navigation state
             navigating = false;
@@ -156,7 +159,7 @@ public:
 
     void add_goal(geometry_msgs::Pose2D goal)
     {
-        if (!navigating)
+        if (!navigating && test_active)
         {
             //Save goal pos
             log.goal.x = goal.x;
@@ -179,6 +182,11 @@ public:
             ROS_INFO("Starting iteration %d", log.iteration);
             ROS_INFO("Goal registered at x:%.3f y:%.3f", goal.x, goal.y);
         }
+    }
+
+    void set_test_status(std_msgs::Bool test_status_msg)
+    {
+        test_active = test_status_msg.data;
     }
 
     void publish_log()
@@ -273,6 +281,11 @@ void state_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr &state)
     
 }
 
+void test_status_callback(const std_msgs::Bool::ConstPtr &test_state)
+{
+    logger->set_test_status(*test_state);
+}
+
 int main(int argc, char **argv)
 {
     // Setup ros node and NodeHandle
@@ -286,7 +299,8 @@ int main(int argc, char **argv)
     ros::Subscriber odom_sub = n.subscribe("amcl/amcl_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
     ros::Subscriber goal_sub = n.subscribe("/goal", 10, goal_callback);
-    ros::Subscriber result = n.subscribe("move_base/result", 10, state_callback);
+    ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);
+    ros::Subscriber test_status = n.subscribe("/test_status", 10, test_status_callback);
 
     logger = new Logger(n);
 
