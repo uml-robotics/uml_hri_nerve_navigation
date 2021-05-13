@@ -44,8 +44,14 @@
   <!-- Flip obstacle spawner -->
   <arg name="flip_obstacle" default="true" />
 
+  <!-- number of iterations the robot will perform -->
+  <arg name="iterations" default="1" /> 
+    
+  <!-- toggle whether the robot should clear the costmaps in between iterations -->
+  <arg name="clear_costmaps" default="true" /> 
+
   <!-- Set up the test -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/setup_test.launch">
+  <include file="$(find uml_hri_nerve_navigation)/launch/run_test.launch">
     <arg name="sim" value="$(arg sim)" />
     <arg name="gui" value="$(arg gui)" />
     <arg name="navigate" value="$(arg navigate)" />
@@ -65,6 +71,7 @@
     <arg name="dynamic_obstacle" value="$(arg dynamic_obstacle)" />
     <arg name="obstacle_name" value="$(arg obstacle_name)" />
     <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
+    <arg name="iterations" value="$(arg iterations)" />
+    <arg name="clear_costmaps" value="$(arg clear_costmaps)" />
   </include>
-
 </launch>
