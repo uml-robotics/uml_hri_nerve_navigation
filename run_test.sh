@@ -63,7 +63,7 @@ echo
 echo "Setting up the $robot robot in the $level environment"
 echo
 echo -----------------------------------------------------------
-roslaunch uml_3d_race "$level".launch sim:="$sim" gui:="$gui" navigate:=true robot:="$robot" 3d:="$threeD" obstacle_bot:="$obstacle_bot" &
+roslaunch uml_hri_nerve_navigation "$level".launch sim:="$sim" gui:="$gui" navigate:=true robot:="$robot" 3d:="$threeD" obstacle_bot:="$obstacle_bot" &
 pid1=$!
 
 sleep 12s
@@ -73,8 +73,8 @@ echo
 echo "Starting loggers"
 echo
 echo -----------------------------------------------------------
-#cd to the logs folder inside of resources in the uml_3d_race package
-roscd uml_3d_race
+#cd to the logs folder inside of resources in the uml_hri_nerve_navigation package
+roscd uml_hri_nerve_navigation
 cd resources/logs
 
 #create a folder to put the logs into and name the folder using the name of the map being used and the current time
@@ -86,7 +86,7 @@ cd $name
 mkdir geotiff_maps
 
 #start the logging scripts
-roslaunch uml_3d_race geotiff_writer.launch map_dir:=$ROS_WORKSPACE/src/uml_3d_race/resources/logs/$name/geotiff_maps &
+roslaunch uml_hri_nerve_navigation geotiff_writer.launch map_dir:=$ROS_WORKSPACE/src/uml_hri_nerve_navigation/resources/logs/$name/geotiff_maps &
 pid2=$!
 rostopic echo -p sim_log > sim_log.csv &
 pid3=$!
@@ -100,7 +100,7 @@ echo
 echo "Starting test"
 echo
 echo -----------------------------------------------------------
-roslaunch uml_3d_race race.launch iterations:="$iterations" clear_costmaps:="$clear_costmaps"
+roslaunch uml_hri_nerve_navigation start_test.launch iterations:="$iterations" clear_costmaps:="$clear_costmaps"
 pid5=$!
 
 #this will kill the script if any errors occur during the test
