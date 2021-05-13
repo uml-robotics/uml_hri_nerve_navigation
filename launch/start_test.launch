@@ -9,24 +9,9 @@
   <arg name="clear_costmaps" default="true" />
 
   <!-- Start moving-->
-  <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" required="true" if="$(eval not namespace)">
+  <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" required="true">
     <param name="iterations" value="$(arg iterations)" />
     <param name="clear_costmaps" value="$(arg clear_costmaps)" />
-  </node>
-
-  <!-- Start moving with namespace-->
-  <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" ns="$(arg namespace)" required="true" unless="$(eval not namespace)">
-    <param name="iterations" value="$(arg iterations)" />
-  </node>
-
-  <!-- Start logging the movement-->
-  <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen" if="$(eval not namespace)">
-    <remap from="odom" to="base_pose_ground_truth" />
-  </node>
-
-  <!-- Start logging the movement with namespace-->
-  <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" ns="$(arg namespace)" output="screen" unless="$(eval not namespace)">
-    <remap from="odom" to="base_pose_ground_truth" />
   </node>
 
 </launch>

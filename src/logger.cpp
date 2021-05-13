@@ -14,6 +14,9 @@
 #include <list>
 #include <cmath>
 #include <boost/algorithm/string.hpp>
+#include <fstream>
+#include <boost/filesystem.hpp>
+
 
 //SimLog is a custom message type defined in uml_hri_nerve_navigation/msg/SimLog.msg
 #include <uml_hri_nerve_navigation/SimLog.h>
@@ -29,10 +32,6 @@ float distance(float x1, float y1, float x2, float y2)
 class Logger
 {
 private:
-    //Publisher
-    ros::Publisher pubLog;
-    ros::Publisher pubConfig;
-
     //Node Handle
     ros::NodeHandle nh;
 
@@ -52,13 +51,14 @@ private:
     bool publishing;
     bool test_active;
 
+    //Files
+    std::fstream csvFile;
+    std::fstream txtFile;
+
 public:
     Logger(ros::NodeHandle n)
     {
-        // Setup publisher
-        pubLog = n.advertise<uml_hri_nerve_navigation::SimLog>("sim_log", 1000, false);
-        pubConfig = n.advertise<std_msgs::String>("robot_config", 1000, true);
-
+        //Setup variable defaults
         nh = n;
         collision_num = 0;
         iteration_collision = 0;
@@ -75,6 +75,23 @@ public:
         log.collision.y = -100000;
 
         log.iteration = 0;
+
+        //Get file path from parameter
+        std::string file_path;
+        n.getParam(ros::this_node::getName()+"/file_path", file_path);
+        std::string file_path_csv = file_path + "/sim_log.csv";
+        std::string file_path_txt = file_path + "/config.txt";
+
+        //Create the folders
+        boost::filesystem::create_directories(file_path.c_str());
+        boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
+
+        //Create files
+        csvFile.open(file_path_csv.c_str(), std::ios::out);
+        txtFile.open(file_path_txt.c_str(), std::ios::out);
+
+        //Write the headers for the csv file
+        csvFile<<"Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Iteration,Event" << std::endl;
     };
 
     void add_position(geometry_msgs::PoseWithCovarianceStamped pose)
@@ -94,7 +111,6 @@ public:
             double roll, pitch, yaw;
             matrix.getEulerYPR(yaw, pitch, roll);
             log.robot_pos.theta = yaw * 180.0 / M_PI;
-            log.dist_from_goal = distance(log.goal.x, log.goal.y, pose.pose.pose.position.x, pose.pose.pose.position.y);
         }
     }
 
@@ -193,8 +209,17 @@ public:
     {
         if (publishing)
         {
+            //Save the current timestamp for the log
             log.header.stamp = ros::Time::now();
-            pubLog.publish(log);
+            
+            //Calculate the distance from the current pos to the goal.  This line is here instead of add_position because the goal can change, 
+            //but the position doesn't and the distance calculation won't be performed until the position changes
+            log.dist_from_goal = distance(log.goal.x, log.goal.y, log.robot_pos.x, log.robot_pos.y);
+
+            //Write the contents of the log msg to the csv file (replace with publisher .publish if you want to publish a sim_log topic)
+            csvFile << log.header.stamp.toNSec() << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
+                    log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
+                    std::to_string(log.iteration) << "," << log.event << std::endl;
 
             //Reset collision coords if a collision was published
             if (log.collision.x != -100000 || log.collision.y != -100000)
@@ -219,9 +244,6 @@ public:
     {
         //Create string to start build the config log
         std::string config;
-
-        //Start config with a quote for multiline formatting in csv
-        config = "\"";
         
         //Save the type of local planner being used
         std::string local_planner;
@@ -240,13 +262,15 @@ public:
         ros::param::get("/move_base/local_costmap/obstacle_range", parameter);
         config += "Obstacle Marking Distance: " + std::to_string(parameter);
 
-        //Close config with a quote for multiline formatting in csv
-        config += "\"";
-
         //Publish the config
-        std_msgs::String configMsg;
-        configMsg.data = config;
-        pubConfig.publish(configMsg);
+        txtFile << config;
+    }
+
+    void close_files()
+    {
+        //Closes the two files that are being written to at the end of the node's life
+        csvFile.close();
+        txtFile.close();
     }
 };
 
@@ -311,10 +335,14 @@ int main(int argc, char **argv)
 
     while (ros::ok())
     {
+        //Start saving the log
         logger->publish_log();
         ros::spinOnce();
         rate.sleep();
     }
+
+    //Close the csv file in the logger
+    logger->close_files();
 
     ros::waitForShutdown();
 

@@ -61,6 +61,12 @@
     <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
   </include>
 
+  <!-- Setup loggers -->
+  <include name="$(find uml_hri_nerve_nav_sim_resources)/launch/start_loggers.launch">
+    <arg name="robot" value="$(arg robot)" />
+    <arg name="level" value="$(arg level)" />
+  </include>
+
   <!-- Setup robot -->
   <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
     <arg name="x" value="$(arg spawn_x)" />

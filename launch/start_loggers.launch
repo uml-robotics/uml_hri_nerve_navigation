@@ -1,0 +1,38 @@
+<launch>
+    <!-- Save the path for the logs using the current time -->
+    <arg name="robot" />
+    <arg name="level" />
+    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_$(arg robot)_%(%d_%m_%Y_%I_%M_%S)T&quot;'" />
+
+    <!-- Start the csv logger-->
+    <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
+        <remap from="odom" to="base_pose_ground_truth" />
+        <remap from="~file_path" to="log_file_path" />
+    </node>
+
+    <!-- Docs: https://wiki.ros.org/hector_geotiff -->
+    <!-- Start the geotiff map writer -->
+    <arg name="map_name" default="traj_map" />
+    <arg name="map_update_interval" default="10.0" />
+
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="hector_trajectory_server" output="screen">
+        <param name="target_frame_name" type="string" value="/map" />
+        <remap from="map" to="/static_map" />
+        <param name="source_frame_name" type="string" value="base_link" />
+        <param name="trajectory_update_rate" type="double" value="4" />
+        <param name="trajectory_publish_rate" type="double" value="0.25" />
+    </node>
+
+    <node pkg="hector_geotiff" type="geotiff_node" name="hector_geotiff_node" output="screen" launch-prefix="nice -n 15">
+        <remap from="map" to="/static_map" />
+        <remap from="~map_file_path" to="log_file_path" />
+        <param name="map_file_base_name" type="string" value="$(arg map_name)" />
+        <param name="draw_background_checkerboard" type="bool" value="true" />
+        <param name="draw_free_space_grid" type="bool" value="false" />
+        <param name="geotiff_save_period" type="double" value="$(arg map_update_interval)" />
+        <param name="plugins" type="string" value="hector_geotiff_plugins/TrajectoryMapWriter" />
+    </node>
+
+    
+
+</launch>
