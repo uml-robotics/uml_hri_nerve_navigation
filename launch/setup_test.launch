@@ -62,9 +62,9 @@
   </include>
 
   <!-- Setup loggers -->
-  <include name="$(find uml_hri_nerve_nav_sim_resources)/launch/start_loggers.launch">
+  <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch">
     <arg name="robot" value="$(arg robot)" />
-    <arg name="level" value="$(arg level)" />
+    <arg name="level" value="$(arg world_name)" />
   </include>
 
   <!-- Setup robot -->
