@@ -17,19 +17,20 @@ int main(int argc, char **argv){
   ROS_WARN("Estop has been activated");
   ROS_WARN("Estop has been activated");
   ROS_WARN("Estop has been activated");
+
+  //Set twist to have 0 velocity
+  geometry_msgs::Twist twist;
+  twist.linear.x = 0;
+  twist.linear.y = 0;
+  twist.linear.z = 0;
+  twist.angular.x = 0;
+  twist.angular.y = 0;
+  twist.angular.z = 0;
   
+  //Publish the velocity at a fast rate
   while(ros::ok())
   {
-      //Set twist to have 0 velocity
-      geometry_msgs::Twist twist;
-      twist.linear.x = 0;
-      twist.linear.y = 0;
-      twist.linear.z = 0;
-      twist.angular.x = 0;
-      twist.angular.y = 0;
-      twist.angular.z = 0;
-
-      vel_pub.publish(twist);
+    vel_pub.publish(twist);
   }
 
   return 0;

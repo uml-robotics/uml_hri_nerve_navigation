@@ -2,7 +2,7 @@
 #include <math.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Pose2D.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <gazebo_msgs/ContactsState.h>
 #include <std_msgs/String.h>
@@ -94,18 +94,18 @@ public:
         csvFile<<"Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Iteration,Event" << std::endl;
     };
 
-    void add_position(geometry_msgs::PoseWithCovarianceStamped pose)
+    void add_position(geometry_msgs::PoseStamped pose)
     {
         if (navigating && test_active)
         {
             //save the position and distance
-            log.robot_pos.x = pose.pose.pose.position.x;
-            log.robot_pos.y = pose.pose.pose.position.y;
+            log.robot_pos.x = pose.pose.position.x;
+            log.robot_pos.y = pose.pose.position.y;
             tf2::Quaternion quaternion;
-            quaternion.setX(pose.pose.pose.orientation.x);
-            quaternion.setY(pose.pose.pose.orientation.y);
-            quaternion.setZ(pose.pose.pose.orientation.z);
-            quaternion.setW(pose.pose.pose.orientation.w);
+            quaternion.setX(pose.pose.orientation.x);
+            quaternion.setY(pose.pose.orientation.y);
+            quaternion.setZ(pose.pose.orientation.z);
+            quaternion.setW(pose.pose.orientation.w);
             tf2::Matrix3x3 matrix;
             matrix.setRotation(quaternion);
             double roll, pitch, yaw;
@@ -217,7 +217,7 @@ public:
             log.dist_from_goal = distance(log.goal.x, log.goal.y, log.robot_pos.x, log.robot_pos.y);
 
             //Write the contents of the log msg to the csv file (replace with publisher .publish if you want to publish a sim_log topic)
-            csvFile << log.header.stamp.toNSec() << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
+            csvFile << std::to_string(log.header.stamp.toNSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
                     log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
                     std::to_string(log.iteration) << "," << log.event << std::endl;
 
@@ -276,7 +276,7 @@ public:
 
 Logger *logger;
 
-void odom_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &pose)
+void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose)
 {
     logger->add_position(*pose);
 }
@@ -316,11 +316,11 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "logger");
     ros::NodeHandle n;
 
-    ros::Rate rate(10);
+    ros::Rate rate(20);
     ros::AsyncSpinner spinner(5);
 
     // Setup subscribers
-    ros::Subscriber odom_sub = n.subscribe("amcl/amcl_pose", 1, odom_callback);
+    ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
     ros::Subscriber goal_sub = n.subscribe("/goal", 10, goal_callback);
     ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);

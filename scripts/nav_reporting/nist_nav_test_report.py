@@ -76,16 +76,16 @@ class Reporter:
         raw_df = pd.read_csv(self.data_name)
         clean_df = raw_df.copy()
         # replace collision's null values w/ 0
-        clean_df.replace({'field.collision.x':-100000, 'field.collision.y':-100000},0,inplace=True)
+        clean_df.replace({'Collision X':-100000, 'Collision Y':-100000},0,inplace=True)
         #remove unnecessary cols
-        clean_df=clean_df.drop(['field.header.frame_id'],axis=1)
+        #clean_df=clean_df.drop(['field.header.frame_id'],axis=1)
         return raw_df, clean_df
 
     def get_position_chart(self):
         ### create robot position chart
         # create new df for plotting robot's path
-        df_pos = self.df_clean[['field.robot_pos.x','field.robot_pos.y']].copy()
-        df_pos = df_pos.rename(columns={'field.robot_pos.x':'robot_pos.x','field.robot_pos.y':'robot_pos.y'})
+        df_pos = self.df_clean[['Robot Pos X','Robot Pos Y']].copy()
+        df_pos = df_pos.rename(columns={'Robot Pos X':'robot_pos.x','Robot Pos Y':'robot_pos.y'})
         # plot robot's path
         robot_path = df_pos.plot.scatter(x='robot_pos.x',
                                    y='robot_pos.y',
@@ -106,11 +106,11 @@ class Reporter:
         # copy df
         #https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.copy.html
         df = self.df_clean.copy()
-        number_of_attempts = df['field.iteration'].unique().size #* 2 
-        num_successful_routes = df['field.event'][df['field.event'].str.contains('Goal was reached', na=False)].size
+        number_of_attempts = df['Iteration'].unique().size #* 2 
+        num_successful_routes = df['Event'][df['Event'].str.contains('Goal was reached', na=False)].size
         route_success_rate = (num_successful_routes / number_of_attempts)*100
         # get # collisions
-        number_of_collisions = df['field.collision.x'].unique().size - 1
+        number_of_collisions = df['Collision X'].unique().size - 1
         highlights = { 'Label': ['Route Attempts','Successful Routes', 'Route Success Rate', 'Collisions'], 'Value': [number_of_attempts,num_successful_routes,route_success_rate,number_of_collisions] }
         highlights_df = pd.DataFrame(highlights)
         return highlights_df
@@ -124,24 +124,24 @@ class Reporter:
         ### time metrics: time summary stats, max route time, min route time
         # get summary stats of route times
         #split rows into "Goal x registered... Goal was reached" chunks
-        dfsub = self.df_clean[['field.header.stamp','field.iteration','field.event']].copy()
-        df_goals = dfsub[dfsub['field.event'].str.contains('Goal', na=False)]
+        dfsub = self.df_clean[['Timestamp','Iteration','Event']].copy()
+        df_goals = dfsub[dfsub['Event'].str.contains('Goal', na=False)]
         #df_goals['field.header.stamp'].diff()
-        df_goal_times = pd.to_datetime(df_goals['field.header.stamp'])
+        df_goal_times = pd.to_datetime(df_goals['Timestamp'])
         diffs = df_goal_times.diff().dropna()
         diffs.apply(lambda x: pd.Timedelta(x) if not pd.isnull(x) else pd.Timedelta(0, unit='ns'))
         time_to_goal_deltas = pd.DataFrame(diffs)
         #drop first row
         time_to_goal_deltas = time_to_goal_deltas[time_to_goal_deltas > pd.Timedelta(seconds=2)].dropna()
         # mean and std of route times
-        mu = time_to_goal_deltas['field.header.stamp'].mean().seconds
-        sigma = time_to_goal_deltas['field.header.stamp'].std().seconds
+        mu = time_to_goal_deltas['Timestamp'].mean().seconds
+        sigma = time_to_goal_deltas['Timestamp'].std().seconds
         return time_to_goal_deltas, mu, sigma
 
     def plot_time_histogram(self,time_to_goal_df, mu, sigma):
         
         # plot histogram of route times
-        time_to_goal = time_to_goal_df['field.header.stamp'].astype(
+        time_to_goal = time_to_goal_df['Timestamp'].astype(
             'timedelta64[s]').plot.hist( ) #xlim=(55,70), ylim=(0,40), figsize=(10,5)
         # comment out below to remove inserting mu,sigma in graph
         plt.text(68,30, r"$\mu={0}$, $\sigma={1}$".format(mu,sigma),horizontalalignment='right', fontsize=16)

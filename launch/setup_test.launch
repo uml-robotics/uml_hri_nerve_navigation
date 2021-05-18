@@ -67,6 +67,18 @@
     <arg name="level" value="$(arg world_name)" />
   </include>
 
+  <!-- Setup dord calculator if navigating in nerve_long_hall -->
+  <include file="$(find uml_hri_nerve_navigation)/launch/dord_calculator.launch" if="$(eval world_name == 'nerve_long_hall')">
+    <arg name="robot" value="$(arg robot)" />
+    <arg name="level" value="$(arg world_name)" />
+    <arg name="goal_a_x" value="$(arg spawn_x)" />
+    <arg name="goal_a_y" value="$(arg spawn_y)" />
+    <arg name="goal_b_x" value="$(arg goal_x)" />
+    <arg name="goal_b_y" value="$(arg goal_y)" />
+    <arg name="obstacle_x" value="0.33057" />
+    <arg name="obstacle_y" value="12.40157" />
+  </include>
+
   <!-- Setup robot -->
   <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
     <arg name="x" value="$(arg spawn_x)" />

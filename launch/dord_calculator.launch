@@ -1,0 +1,26 @@
+<launch>
+    <!-- Save the path for the logs using the current time -->
+    <arg name="robot" />
+    <arg name="level" />
+    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_$(arg robot)_%(%d_%m_%Y_%I_%M_%S)T&quot;'" />
+
+    <!-- Get environment info -->
+    <arg name="goal_a_x" default="0" />
+    <arg name="goal_a_y" default="0" />
+    <arg name="goal_b_x" default="1" />
+    <arg name="goal_b_y" default="1" />
+    <arg name="obstacle_x" default="0" />
+    <arg name="obstacle_y" default="0" />
+
+    <!-- Start the dord calculator-->
+    <node name="dord_calculator" type="dord_calculator" pkg="uml_hri_nerve_navigation" output="screen">
+        <remap from="~file_path" to="log_file_path" />
+        <param name="goal_a_x" value="$(arg goal_a_x)" />
+        <param name="goal_a_y" value="$(arg goal_a_y)" />
+        <param name="goal_b_x" value="$(arg goal_b_x)" />
+        <param name="goal_b_y" value="$(arg goal_b_y)" />
+        <param name="obstacle_x" value="$(arg obstacle_x)" />
+        <param name="obstacle_y" value="$(arg obstacle_y)" />
+    </node>
+
+</launch>

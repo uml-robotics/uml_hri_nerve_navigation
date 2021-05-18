@@ -155,6 +155,7 @@ add_executable(goal_publisher src/goal_pub.cpp)
 add_executable(obstacle_bot_node src/obstacle_bot.cpp)
 add_executable(logger src/logger.cpp)
 add_executable(estop src/estop.cpp)
+add_executable(dord_calculator src/dord_calculator.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,6 +171,7 @@ add_dependencies(goal_publisher ${goal_publisher_EXPORTED_TARGETS} ${catkin_EXPO
 add_dependencies(obstacle_bot_node ${obstacle_bot_node_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(logger ${logger_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(estop ${estop_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(dord_calculator ${dord_calculator_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -188,6 +190,9 @@ target_link_libraries(logger
   ${catkin_LIBRARIES}
 )
 target_link_libraries(estop
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(dord_calculator
   ${catkin_LIBRARIES}
 )
 

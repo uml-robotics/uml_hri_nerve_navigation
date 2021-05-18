@@ -32,7 +32,5 @@
         <param name="geotiff_save_period" type="double" value="$(arg map_update_interval)" />
         <param name="plugins" type="string" value="hector_geotiff_plugins/TrajectoryMapWriter" />
     </node>
-
     
-
 </launch>
