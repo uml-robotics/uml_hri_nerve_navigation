@@ -24,18 +24,13 @@
   <arg name="base_link" value="$(arg namespace)/base_footprint" />
   
   <!-- Setup nav stack-->
-  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/setup_navigation.launch">
+  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_obstacle_bot.launch">
     <arg name="robot" value="$(arg robot)"/>
     <arg name="namespace" value="$(arg namespace)" />
-    <arg name="x" value="$(arg x)" />
-    <arg name="y" value="$(arg y)" />
-    <arg name="z" value="$(arg z)" />
-    <arg name="yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
-    <arg name="level" value="$(arg level)" />
-    <arg name="navigate" value="$(arg navigate)" />
-    <arg name="3d" value="$(arg 3d)" />
+    <arg name="init_x" value="$(arg x)" />
+    <arg name="init_y" value="$(arg y)" />
+    <arg name="init_yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
     <arg name="laser_topic" value="$(arg laser_topic)" />
-    <arg name="pointcloud_topic" value="$(arg pointcloud_topic)_filtered" />
     <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
     <arg name="odom_topic" value="$(arg odom_topic)" />
     <arg name="odom_link" value="$(arg odom_link)"/>

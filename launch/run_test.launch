@@ -100,7 +100,7 @@
     </include>
   
     <!-- Setup obstacle bot if wanted -->
-    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_robot.launch" if="$(arg obstacle_bot)">
+    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_bot.launch" if="$(arg obstacle_bot)">
       <arg name="x" value="$(arg goal_x)" />
       <arg name="y" value="$(arg goal_y)" />
       <arg name="z" value="$(arg spawn_z)" />
