@@ -11,7 +11,7 @@ map_type: costmap
 2d_obstacles:
   observation_sources: laser
   laser: {data_type: LaserScan, 
-          topic: /frontscan_filtered, 
+          topic: /obstacle_bot/scan, 
           marking: true, 
           clearing: true, 
           expected_update_rate: 0.3,

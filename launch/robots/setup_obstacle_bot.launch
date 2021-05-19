@@ -3,11 +3,6 @@
   <!-- This launch file includes all the nodes needed to setup a simulated obstacle_bot for navigation -->
 
   <!-- Settings (Robot position args are overidden by spawn_world.launch)-->
-  <arg name="x" default="0.0" />
-  <arg name="y" default="0.0" />
-  <arg name="z" default="0.0" />
-  <arg name="yaw" default="0.0" />
-  <!-- Rotation in radians. -->
   <arg name="level" default="level1" />
   <arg name="navigate" default="" /> <!-- Not used, just here to prevent extra arg errors -->
   <arg name="3d" default="" /> <!-- Not used, just here to prevent extra arg errors -->
@@ -27,9 +22,6 @@
   <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_obstacle_bot.launch">
     <arg name="robot" value="$(arg robot)"/>
     <arg name="namespace" value="$(arg namespace)" />
-    <arg name="init_x" value="$(arg x)" />
-    <arg name="init_y" value="$(arg y)" />
-    <arg name="init_yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
     <arg name="laser_topic" value="$(arg laser_topic)" />
     <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
     <arg name="odom_topic" value="$(arg odom_topic)" />

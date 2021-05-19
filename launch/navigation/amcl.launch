@@ -1,12 +1,8 @@
 <launch>
 	<!-- Doc: http://wiki.ros.org/amcl?distro=kinetic -->
 
-	<arg name="namespace" default="" />
-
-	<!-- Args to set the initial orientation of AMCL node. -->
-	<arg name="init_x" default="0.0" />
-	<arg name="init_y" default="0.0" />
-	<arg name="init_yaw" default="0.0" /> <!-- Radians -->
+	<!-- Determines whether to use regular spawn coords or obstacle bot coords from parameter server -->
+	<arg name="obstacle_bot" default="false" />
 
 	<!-- Topic remappings-->
 	<arg name="scan_topic" default="base_scan" />
@@ -14,11 +10,12 @@
   	<arg name="base_link" default="base_link" />
 
 	<!-- AMCL Node -->
-	<node pkg="amcl" type="amcl" name="amcl" if="$(eval not namespace)" output="screen">
+	<node pkg="amcl" type="amcl" name="amcl" unless="$(arg obstacle_bot)" output="screen">
 		<!-- Set initial pose -->
-		<param name="initial_pose_x" value="$(arg init_x)" />
-		<param name="initial_pose_y" value="$(arg init_y)" />
-		<param name="initial_pose_a" value="$(arg init_yaw)" />
+		<remap from="~initial_pose_x" to="/robot_spawn_x" />
+		<remap from="~initial_pose_y" to="/robot_spawn_y" />
+		<remap from="~initial_pose_a" to="/robot_spawn_yaw" />
+
 		<!-- Remap scan topic -->
 		<remap from="scan" to="$(arg scan_topic)"/>
 		<!-- Remap map topic -->
@@ -74,12 +71,13 @@
 		<param name="recovery_alpha_fast" value="0.0"/>
 	</node>
 
-	<!-- AMCL Node with namespace-->
-	<node pkg="amcl" type="amcl" name="amcl" ns="$(arg namespace)" unless="$(eval not namespace)">
+	<!-- AMCL Node for obstacle bot -->
+	<node pkg="amcl" type="amcl" name="amcl" if="$(arg obstacle_bot)">
 		<!-- Set initial pose -->
-		<param name="initial_pose_x" value="$(arg init_x)" />
-		<param name="initial_pose_y" value="$(arg init_y)" />
-		<param name="initial_pose_a" value="$(arg init_yaw)" />
+		<remap from="~initial_pose_x" to="/obstacle_bot_spawn_x" />
+		<remap from="~initial_pose_y" to="/obstacle_bot_spawn_y" />
+		<remap from="~initial_pose_a" to="/obstacle_bot_spawn_yaw" />
+
 		<!-- Remap scan topic -->
 		<remap from="scan" to="$(arg scan_topic)"/>
 		<!-- Remap map topic -->

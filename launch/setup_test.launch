@@ -61,6 +61,14 @@
     <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
   </include>
 
+  <!-- Set a default spawn location for amcl to goal a if not in simulation -->
+  <group unless="$(arg sim)">
+    <param name="robot_spawn_x" value="$(arg spawn_x)" />
+    <param name="robot_spawn_y" value="$(arg spawn_x)" />
+    <param name="robot_spawn_z" value="$(arg spawn_x)" />
+    <param name="robot_spawn_yaw" value="$(arg spawn_x)" />
+  </group>
+
   <!-- Setup loggers -->
   <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch">
     <arg name="robot" value="$(arg robot)" />
@@ -81,23 +89,24 @@
 
   <!-- Setup robot -->
   <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
-    <arg name="x" value="$(arg spawn_x)" />
-    <arg name="y" value="$(arg spawn_y)" />
-    <arg name="z" value="$(arg spawn_z)" />
-    <arg name="yaw" value="$(arg spawn_yaw)" />
     <arg name="level" value="$(arg world_name)" />
     <arg name="navigate" value="$(arg navigate)" />
     <arg name="3d" value="$(arg 3d)" />
   </include>
 
   <!-- Setup obstacle bot if wanted -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_robot.launch" if="$(arg obstacle_bot)">
-    <arg name="x" value="$(arg goal_x)" />
-    <arg name="y" value="$(arg goal_y)" />
-    <arg name="z" value="$(arg spawn_z)" />
-    <arg name="yaw" value="$(arg spawn_yaw)" />
-    <arg name="level" value="$(arg world_name)" />
-    <arg name="navigate" value="$(arg navigate)" />
-  </include>
+  <group if="$(arg obstacle_bot)">
+    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_bot.launch" if="$(arg obstacle_bot)">
+      <arg name="level" value="$(arg world_name)" />
+      <arg name="navigate" value="$(arg navigate)" />
+    </include>
+
+    <group unless="$(arg sim)">
+      <param name="obstacle_bot_spawn_x" value="$(arg spawn_x)" />
+      <param name="obstacle_bot_spawn_y" value="$(arg spawn_x)" />
+      <param name="obstacle_bot_spawn_z" value="$(arg spawn_x)" />
+      <param name="obstacle_bot_spawn_yaw" value="$(arg spawn_x)" />
+    </group>
+  </group>
 
 </launch>

@@ -7,11 +7,6 @@
   <arg name="robot_type" default="pioneer" />
   <!-- Map name -->
   <arg name="map" default="level1" />
-  <!-- Initial orientation for AMCL node. (Should be set to match robot spawn position) -->
-  <arg name="init_x" default="0.0" />
-  <arg name="init_y" default="0.0" />
-  <arg name="init_yaw" default="0.0" />
-  <!-- Radians -->
   <!-- Move_base configuration folder. -->
   <arg name="move_base_config" default="3d" />
   <!-- NOTE: move_base_config specifies the folder to find the .yaml config files for
@@ -47,11 +42,15 @@
 
     <!--- Launch AMCL (Laser Localization) -->
     <group if="$(arg has_laser)">
-      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch">
-        <arg name="namespace" value="$(arg namespace)" />
-        <arg name="init_x" value="$(arg init_x)" />
-        <arg name="init_y" value="$(arg init_y)" />
-        <arg name="init_yaw" value="$(arg init_yaw)" />
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch" if="$(eval not namespace)">
+        <arg name="obstacle_bot" value="false" />
+        <arg name="scan_topic" value="$(arg laser_topic)" />
+        <arg name="odom_link" value="$(arg odom_link)" />
+        <arg name="base_link" value="$(arg base_link)" />
+      </include>
+
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch" unless="$(eval not namespace)" ns="$(arg namespace)">
+        <arg name="obstacle_bot" value="false" />
         <arg name="scan_topic" value="$(arg laser_topic)" />
         <arg name="odom_link" value="$(arg odom_link)" />
         <arg name="base_link" value="$(arg base_link)" />
@@ -59,11 +58,13 @@
     </group>
 
     <group unless="$(arg has_laser)">
-      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch">
-        <arg name="namespace" value="$(arg namespace)" />
-        <arg name="init_x" default="$(arg init_x)" />
-        <arg name="init_y" default="$(arg init_y)" />
-        <arg name="init_yaw" default="$(arg init_yaw)" />
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch" if="$(eval not namespace)">
+        <arg name="scan_topic" value="pointcloud_scan" />
+        <arg name="odom_link" value="$(arg odom_link)" />
+        <arg name="base_link" value="$(arg base_link)" />
+      </include>
+
+      <include file="$(find uml_hri_nerve_navigation)/launch/navigation/amcl.launch" unless="$(eval not namespace)" ns="$(arg namespace)">
         <arg name="scan_topic" value="pointcloud_scan" />
         <arg name="odom_link" value="$(arg odom_link)" />
         <arg name="base_link" value="$(arg base_link)" />
@@ -75,8 +76,14 @@
   <group unless="$(arg use_static_map)">
 
     <!-- Include gmapper -->
-    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch">
-      <arg name="namespace" value="$(arg namespace)" />
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch" if="$(eval not namespace)">
+      <arg name="scan_topic" value="$(arg laser_topic)" />
+      <arg name="odom_link" value="$(arg odom_link)" />
+      <arg name="base_link" value="$(arg base_link)" />
+    </include>
+
+    <!-- Include gmapper with namespace-->
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch" unless="$(eval not namespace)" ns="$(arg namespace)">
       <arg name="scan_topic" value="$(arg laser_topic)" />
       <arg name="odom_link" value="$(arg odom_link)" />
       <arg name="base_link" value="$(arg base_link)" />
@@ -87,20 +94,36 @@
   <!-- Launch move_base -->
   <!-- Note that you will also need to change the relevant .yaml files (or make new copies)
        if you wish to use another namespace/robot_name. -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)">
-    <arg name="namespace" value="$(arg namespace)" />
-    <arg name="config" value="$(arg move_base_config)" />
-    <arg name="robot_type" value="$(arg robot_type)" />
-    <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
-    <arg name="odom_topic" value="$(arg odom_topic)" />
-  </include>
+  <group if="$(eval not namespace)">
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)">
+      <arg name="config" value="$(arg move_base_config)" />
+      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_topic" value="$(arg odom_topic)" />
+    </include>
 
-  <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)">
-    <arg name="namespace" value="$(arg namespace)" />
-    <arg name="config" value="$(arg move_base_config)_unknown" />
-    <arg name="robot_type" value="$(arg robot_type)" />
-    <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
-    <arg name="odom_topic" value="$(arg odom_topic)" />
-  </include>
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)">
+      <arg name="config" value="$(arg move_base_config)_unknown" />
+      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_topic" value="$(arg odom_topic)" />
+    </include>
+  </group>
+
+  <group unless="$(eval not namespace)">
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)" ns="$(arg namespace)">
+      <arg name="config" value="$(arg move_base_config)" />
+      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_topic" value="$(arg odom_topic)" />
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)" ns="$(arg namespace)">
+      <arg name="config" value="$(arg move_base_config)_unknown" />
+      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
+      <arg name="odom_topic" value="$(arg odom_topic)" />
+    </include>
+  </group>
 
 </launch>

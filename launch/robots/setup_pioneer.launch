@@ -3,10 +3,6 @@
   <!-- This launch file includes all the nodes needed to setup a simulated pioneer for navigation -->
 
   <!-- Settings (Robot position args are overidden by spawn_world.launch)-->
-  <arg name="x" default="0.0" />
-  <arg name="y" default="0.0" />
-  <arg name="z" default="0.0" />
-  <arg name="yaw" default="0.0" />
   <!-- Rotation in radians. -->
   <arg name="level" default="level1" />
   <arg name="navigate" default="true" />
@@ -38,7 +34,6 @@
 
   <!-- Start pointcloud filter-->
   <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pointcloud_filter.launch">
-      <arg name="namespace" value="" />
       <arg name="input_cloud" value="$(arg pointcloud_topic)" />
       <arg name="output_cloud" value="$(arg pointcloud_topic)_filtered" />
   </include>
@@ -52,10 +47,6 @@
   <include file="$(find uml_hri_nerve_navigation)/launch/navigation/setup_navigation.launch">
     <arg name="robot" value="$(arg robot)"/>
     <arg name="namespace" value="" />
-    <arg name="x" value="$(arg x)" />
-    <arg name="y" value="$(arg y)" />
-    <arg name="z" value="$(arg z)" />
-    <arg name="yaw" value="$(arg yaw)" /> <!-- Rotation in radians. -->
     <arg name="level" value="$(arg level)" />
     <arg name="navigate" value="$(arg navigate)" />
     <arg name="3d" value="$(arg 3d)" />
