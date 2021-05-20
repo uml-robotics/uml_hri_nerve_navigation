@@ -29,7 +29,4 @@
     <arg name="base_link" value="$(arg base_link)" />
   </include>
 
-  <!-- Start moving -->
-  <node name="obstacle_bot_mover" type="obstacle_bot_node" pkg="uml_hri_nerve_navigation" ns="$(arg namespace)" />
-
 </launch>

@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     //Subscribe to the goal topic
-    ros::Subscriber sub = n.subscribe("/goal", 1, goalCallback);
+    ros::Subscriber sub = n.subscribe("goal", 1, goalCallback);
 
     //Publisher to show whether the test is being performed or not
     testStatusPub = n.advertise<std_msgs::Bool>("/test_status", 1000, true);
@@ -158,9 +158,9 @@ int main(int argc, char **argv)
     //Set up move base client and services
     ac = new MoveBaseClient("move_base", true);
     costmap_service = n.serviceClient<std_srvs::Empty>("move_base/clear_costmaps");
-    goal_service = n.serviceClient<std_srvs::Empty>("/get_new_goal");
-    initial_goal_service = n.serviceClient<std_srvs::Empty>("/get_initial_goal");
-    reset_goals_service = n.serviceClient<std_srvs::Empty>("/reset_goals");
+    goal_service = n.serviceClient<std_srvs::Empty>("get_new_goal");
+    initial_goal_service = n.serviceClient<std_srvs::Empty>("get_initial_goal");
+    reset_goals_service = n.serviceClient<std_srvs::Empty>("reset_goals");
 
     //Set defaults
     goals_reached = 0;

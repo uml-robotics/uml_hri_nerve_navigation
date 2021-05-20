@@ -116,6 +116,14 @@
       <param name="obstacle_bot_spawn_z" value="$(arg spawn_x)" />
       <param name="obstacle_bot_spawn_yaw" value="$(arg spawn_x)" />
     </group>
+
+    <!-- Set up global goal publisher for the obstacle_bot -->
+    <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen" ns="obstacle_bot">
+      <param name="goal_x" value="$(arg goal_x)" />
+      <param name="goal_y" value="$(arg goal_y)" />
+      <param name="spawn_x" value="$(arg spawn_x)" />
+      <param name="spawn_y" value="$(arg spawn_y)" />
+    </node>
   </group>
 
   <!-- Start moving-->
@@ -123,5 +131,8 @@
     <param name="iterations" value="$(arg iterations)" />
     <param name="clear_costmaps" value="$(arg clear_costmaps)" />
   </node>
+
+  <!-- Start moving obstacle_bot if present-->
+  <node name="obstacle_bot_mover" pkg="uml_hri_nerve_navigation" type="obstacle_bot_node" ns="obstacle_bot" launch-prefix="bash -c 'sleep $(arg start_test_delay); $0 $@' "/>
 
 </launch>

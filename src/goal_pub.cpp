@@ -10,7 +10,6 @@
 #include <geometry_msgs/Pose2D.h>
 
 ros::Publisher goal_pub;
-ros::Publisher goal_pub_opposite;
 int counter;
 float goal_x;
 float goal_y;
@@ -23,7 +22,6 @@ float goal_tolerance;
 bool newGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
   geometry_msgs::Pose2D goal;
-  geometry_msgs::Pose2D goal_opposite;
 
   //Determines which goal needs to be published
   if(counter % 2 == 0)
@@ -32,11 +30,6 @@ bool newGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &r
     goal.x = goal_x;                  
     goal.y = goal_y;
     goal.theta = goal_theta;
-
-    //Set the opposite goal to the original spawn coords
-    goal_opposite.x = spawn_x;                  
-    goal_opposite.y = spawn_y;
-    goal_opposite.theta = spawn_theta;
   }
   else
   {
@@ -44,18 +37,10 @@ bool newGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &r
     goal.x = spawn_x;                  
     goal.y = spawn_y;
     goal.theta = spawn_theta;
-
-    //Set the opposite goal to the original goal coords
-    goal_opposite.x = goal_x;                  
-    goal_opposite.y = goal_y;
-    goal_opposite.theta = goal_theta;
   }
 
   //Publish the goal
   goal_pub.publish(goal);
-
-  //Publish the opposite goal
-  goal_pub_opposite.publish(goal_opposite);
 
   //Increase count to alternate goals
   counter++;
@@ -66,12 +51,6 @@ bool newGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &r
 bool initialGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
   geometry_msgs::Pose2D startingPosition;
-  geometry_msgs::Pose2D startingGoal;
-
-  //Set the initial Goal
-  startingGoal.x = goal_x;                  
-  startingGoal.y = goal_y;
-  startingGoal.theta = goal_theta;
 
   //Set the initial position
   startingPosition.x = spawn_x;                  
@@ -80,9 +59,6 @@ bool initialGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Respons
 
   //Publish the initial position on the goal topic so the robot navigates to the initial position
   goal_pub.publish(startingPosition);
-
-  //Publish the initial goal
-  goal_pub_opposite.publish(startingGoal);
   
   return true;
 }
@@ -121,10 +97,7 @@ int main(int argc, char **argv){
   ROS_INFO("GOAL_A | Point: (%.2f,%.2f)\tGOAL_B | Point: (%.2f,%.2f)",spawn_x,spawn_y,goal_x,goal_y);
 
   //Create the publisher object
-  goal_pub = n.advertise<geometry_msgs::Pose2D>("/goal", 1, true);
-
-  //Create the opposite publisher object, mainly used by obstacle bot
-  goal_pub_opposite = n.advertise<geometry_msgs::Pose2D>("goal_opposite", 10, false);
+  goal_pub = n.advertise<geometry_msgs::Pose2D>("goal", 1, true);
   
   //Create the service callbacks
   ros::ServiceServer goal_server = n.advertiseService("get_new_goal", newGoalCallback);

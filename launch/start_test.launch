@@ -4,14 +4,17 @@
   moving between goals A and B for a specified number of iterations. The logger node will publish a custom topic that contains
   important robot log data.  -->
 
-  <arg name="namespace" default="" />
   <arg name="iterations" default="1" />
   <arg name="clear_costmaps" default="true" />
+  <arg name="obstacle_bot" default="false" />
 
   <!-- Start moving-->
   <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" required="true">
     <param name="iterations" value="$(arg iterations)" />
     <param name="clear_costmaps" value="$(arg clear_costmaps)" />
   </node>
+
+  <!-- Start moving obstacle_bot if present-->
+  <node name="obstacle_bot_mover" pkg="uml_hri_nerve_navigation" type="obstacle_bot_node" ns="obstacle_bot" />
 
 </launch>

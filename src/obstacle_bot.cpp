@@ -40,7 +40,16 @@ void goalCallback(geometry_msgs::Pose2D goal_msg)
   {
     ROS_WARN("Failed to clear costmaps");
   }
-  
+
+  //Add a small delay before continuing to navigate
+  ros::Duration(2).sleep();
+
+  //Request next goal
+  if (!goal_service.call(service_msg))
+  {
+    ROS_ERROR("Failed to request for a goal");
+  }
+
   return;
 }
 
@@ -51,10 +60,11 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   //Subscribe to the goal topic
-  ros::Subscriber sub = n.subscribe("/goal_opposite", 10, goalCallback);
+  ros::Subscriber sub = n.subscribe("goal", 10, goalCallback);
 
   ac = new MoveBaseClient("move_base", true);
   costmap_service = n.serviceClient<std_srvs::Empty>("move_base/clear_costmaps");
+  goal_service = n.serviceClient<std_srvs::Empty>("get_new_goal");
 
   //wait for the action server to come up
   while (!ac->waitForServer(ros::Duration(5.0)))
@@ -64,6 +74,13 @@ int main(int argc, char **argv)
 
   //wait for services
   costmap_service.waitForExistence();
+
+  //Request first goal
+  std_srvs::Empty service_msg;
+  if (!goal_service.call(service_msg))
+  {
+    ROS_ERROR("Failed to request for a goal");
+  }
 
   //Keeps the node running and performs necessary updates
   ros::spin();

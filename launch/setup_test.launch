@@ -17,15 +17,15 @@
   <arg name="robot" default="pioneer" />
 
   <!-- Define the two goal points and two obstacle spawn points on the map, values are set in the level launch files-->
-  <arg name="spawn_x" default="0"/>
-  <arg name="spawn_y" default="0"/>
-  <arg name="spawn_z" default="0"/>
-  <arg name="spawn_yaw" default="0"/>
+  <arg name="spawn_x" default="0" />
+  <arg name="spawn_y" default="0" />
+  <arg name="spawn_z" default="0" />
+  <arg name="spawn_yaw" default="0" />
 
-  <arg name="goal_x" default="0"/>
-  <arg name="goal_y" default="0"/>
-  <arg name="goal_z" default="0"/>
-  <arg name="goal_yaw" default="0"/>
+  <arg name="goal_x" default="0" />
+  <arg name="goal_y" default="0" />
+  <arg name="goal_z" default="0" />
+  <arg name="goal_yaw" default="0" />
 
   <!-- Define map settings, values are set in the level launch files-->
   <arg name="world_name" />
@@ -42,21 +42,21 @@
 
   <!-- Flip obstacle spawner -->
   <arg name="flip_obstacle" default="true" />
-  
+
   <!-- Set up global goal publisher -->
   <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen">
     <param name="goal_x" value="$(arg goal_x)" />
     <param name="goal_y" value="$(arg goal_y)" />
     <param name="spawn_x" value="$(arg spawn_x)" />
     <param name="spawn_y" value="$(arg spawn_y)" />
-  </node>  
+  </node>
 
   <!-- Setup the simulation if the test is being performed in simulation -->
   <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/levels/$(arg world_path).launch" if="$(arg sim)">
     <arg name="gui" value="$(arg gui)" />
-    <arg name="robot" value="$(arg robot)"/>
-    <arg name="obstacle_bot" value="$(arg obstacle_bot)"/>
-    <arg name="dynamic_obstacle" value="$(arg dynamic_obstacle)"/>
+    <arg name="robot" value="$(arg robot)" />
+    <arg name="obstacle_bot" value="$(arg obstacle_bot)" />
+    <arg name="dynamic_obstacle" value="$(arg dynamic_obstacle)" />
     <arg name="obstacle_name" value="$(arg obstacle_name)" />
     <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
   </include>
@@ -107,6 +107,14 @@
       <param name="obstacle_bot_spawn_z" value="$(arg spawn_x)" />
       <param name="obstacle_bot_spawn_yaw" value="$(arg spawn_x)" />
     </group>
+
+    <!-- Set up global goal publisher for the obstacle_bot -->
+    <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen" ns="obstacle_bot">
+      <param name="goal_x" value="$(arg goal_x)" />
+      <param name="goal_y" value="$(arg goal_y)" />
+      <param name="spawn_x" value="$(arg spawn_x)" />
+      <param name="spawn_y" value="$(arg spawn_y)" />
+    </node>
   </group>
 
 </launch>
