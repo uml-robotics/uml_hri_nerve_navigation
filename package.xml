@@ -50,9 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>laser_filters</build_depend>
-  <build_depend>gazebo_ros</build_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
   <build_depend>message_generation</build_depend>
@@ -63,6 +61,7 @@
   <build_depend>navigation</build_depend>
   <build_depend>fetch_ros</build_depend>
   <build_depend>fetch_gazebo</build_depend>
+  <build_depend>mir_robot</build_depend>
   <build_depend>gmapping</build_depend>
   <build_depend>hector_slam</build_depend>
   <build_depend>octomap</build_depend>
@@ -75,9 +74,7 @@
   <build_depend>spatio_temporal_voxel_layer</build_depend>
   <build_depend>teleop_twist_keyboard</build_depend>
   <build_export_depend>laser_filters</build_export_depend>
-  <build_export_depend>gazebo_ros</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>std_srvs</build_export_depend>
   <build_export_depend>move_base_msgs</build_export_depend>
@@ -87,6 +84,7 @@
   <build_export_depend>navigation</build_export_depend>
   <build_export_depend>fetch_ros</build_export_depend>
   <build_export_depend>fetch_gazebo</build_export_depend>
+  <build_export_depend>mir_robot</build_export_depend>
   <build_export_depend>gmapping</build_export_depend>
   <build_export_depend>hector_slam</build_export_depend>
   <build_export_depend>octomap</build_export_depend>
@@ -99,9 +97,7 @@
   <build_export_depend>spatio_temporal_voxel_layer</build_export_depend>
   <build_export_depend>teleop_twist_keyboard</build_export_depend>
   <exec_depend>laser_filters</exec_depend>
-  <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
-  <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>std_srvs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
@@ -112,6 +108,7 @@
   <exec_depend>navigation</exec_depend>
   <exec_depend>fetch_ros</exec_depend>
   <exec_depend>fetch_gazebo</exec_depend>
+  <exec_depend>mir_robot</exec_depend>
   <exec_depend>gmapping</exec_depend>
   <exec_depend>hector_slam</exec_depend>
   <exec_depend>octomap</exec_depend>
