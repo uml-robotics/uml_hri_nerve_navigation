@@ -1,13 +1,7 @@
 <launch>
     <!-- This launch file launches the custom estop node found at src/estop.cpp -->
 
-    <!-- First get the namespace of the robot if there is one-->
-    <arg name="namespace" default="" />
-
     <!-- Activate Estop-->
-    <node type="estop" name="robot_estop" pkg="uml_hri_nerve_navigation" output="screen" if="$(eval not namespace)"/>
-
-    <!-- Activate Estop with namespace-->
-    <node type="estop" name="robot_estop" pkg="uml_hri_nerve_navigation" output="screen" ns="$(arg namespace)" unless="$(eval not namespace)"/>
+    <node type="estop" name="robot_estop" pkg="uml_hri_nerve_navigation" output="screen" />
 
 </launch>

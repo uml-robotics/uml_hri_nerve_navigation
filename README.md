@@ -3,6 +3,7 @@
 
 ## About:
   The UML HRI Nerve Navigation package is used for performing several navigation tests that help quantify important characteristics of a navigating robot. Examples of these characteristics include the performance of a robot's path planner and the peformance of a robot's obstacle detection algorithms. A navigation test consists of an environment with two goals, goals A and B. The robot will start the test at goal A and then attempts to navigate to goal B.  Once the robot reaches goal B or the robot decides it cannot reach goal B, the robot will attempt to navigate back to goal A.  A single iteration of a navigation test will be completed once the robot either reaches or gives up navigating to goal A. To measure the repeatability of the robot's performance, a full navigation test will consist of multiple iterations of the robot traveling from goal A to goal B and back to goal A. After the test is complete, characteristics of a navigating robot can be found by comparing the robot's performace to the theoretical performance or the performace of a difference robot that completed  the same test. Depending on the configuration of the environement, different characteristics can be more easily measured than others.  For example, if one wanted to measure how well a robot can avoid small obstacles, small cubes can be inserted into the navigation environment.  The image below shows an example of a navigation test environment.
+  
   ![Example Test Environment](resources/screenshots/test_setup.png) 
 
 ## Setup:
@@ -128,19 +129,18 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   Example command to set up a test in level1 in simulation with a pioneer robot.
   > roslaunch uml_hri_nerve_navigation setup_test.launch world_name:=level1 world_file:=level1 spawn_x:=0.0 spawn_y:=0.0 spawn_z:=0.0 spawn_yaw:=0.0 sim:=true robot:=pioneer
 
-* **start_test.launch** - This launch file simply starts a mover node. The mover node is responsible for commanding the robot between goals A and B for a specified number of iterations. The robot's costmap_clear service call between iterations can also be turned on and off using the boolean parameter clear_costmaps.   
+* **start_test.launch** - This launch file simply starts a mover node. The mover node is responsible for commanding the robot between goals A and B for a specified number of iterations. The robot's costmap_clear service call between iterations can also be turned on and off using the boolean parameter clear_costmaps. An obstacle bot mover node will also be started if the obstacle bot parameter is true  
 **Arguments:** 
   * **iterations (default: 1)** - Int argument that specifies the number of times the robot will travel from goal A to goal B and back to goal A.
   * **clear_costmaps (default: true)** - Boolean argument that specifies whether the robot's costmaps will be cleared in between each navigation goal.
-  * The rest of the arguments are the same as the setup_test.launch file
-  * **namespace (default: "")** - String argument that specifies the robot's namespace if it has one.
+  * **obstacle_bot (default: false)** - Boolean argument that specifes whether an obstacle_bot is being used or not
 
   Example command for starting a test with 5 iterations, and the robot's costmaps will clear in between goals
   > roslaunch uml_hri_nerve_navigation start_test.launch iterations:=5 clear_costmaps:=true
 
 * **estop.launch** - A software emergency stop in case the robot gets out of control during a test.     
 **Arguments:**
-  * **namespace (default: "")** - String argument that specifies the robot's namespace if it has one.
+  * none
 
   Example command for activing the estop for a robot that does not have a namespace
   >roslaunch uml_hri_nerve_navigation estop.launch
@@ -158,10 +158,6 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   * **level (default: true)** - String argument that specifies the name of the static navigation map for the current environment.
   * **navigate (default: true)** - Boolean argument that specifies whether the robot should launch in navigation mode or in mapping mode.
   * **3d (default: true)** - Boolean argument that specifies whether the robot should navigate with 3d sensors (rgbd cameras) or just with 2d sensors (LIDARs).
-  * **x (default: 0)** - Double argument that specifies the x coordinate for amcl localization.
-  * **y (default: 0)** - Double argument that specifies the y coordinate for amcl localization.
-  * **z (default: 0)** - Double argument that specifies the z coordinate for amcl localization
-  * **yaw (default: 0)** - Double argument that specifies the yaw coordinate for amcl localization.
 
   Example command to set up a pioneer robot with a spawn location for amcl localization
   > roslaunch uml_hri_nerve_navigation spawn_robot.launch robot:=pioneer x:=5.0 y:=5.0 yaw:=3.14 level:=level1
