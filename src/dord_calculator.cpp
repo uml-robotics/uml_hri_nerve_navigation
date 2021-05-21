@@ -266,6 +266,8 @@ int main(int argc, char **argv)
     //Close the csv file in the calculator
     calculator->close_file();
 
+    delete calculator;
+
     ros::waitForShutdown();
 
     return 0;

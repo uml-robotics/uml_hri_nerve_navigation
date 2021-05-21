@@ -344,6 +344,8 @@ int main(int argc, char **argv)
     //Close the csv file in the logger
     logger->close_files();
 
+    delete logger;
+
     ros::waitForShutdown();
 
     return 0;
