@@ -55,84 +55,29 @@
   <!-- toggle whether the robot should clear the costmaps in between iterations -->
   <arg name="clear_costmaps" default="true" />
 
-  <!-- Set up global goal publisher -->
-  <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen">
-    <param name="goal_a_x" value="$(arg goal_a_x)" />
-    <param name="goal_a_y" value="$(arg goal_a_y)" />
-    <param name="goal_a_yaw" value="$(arg goal_a_yaw)" />
-    <param name="goal_b_x" value="$(arg goal_b_x)" />
-    <param name="goal_b_y" value="$(arg goal_b_y)" />
-    <param name="goal_b_yaw" value="$(arg goal_b_yaw)" />
-  </node>
-
-  <!-- Setup the simulation if the test is being performed in simulation -->
-  <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/levels/$(arg world_path).launch" if="$(arg sim)">
+  <!-- Set up the test -->
+  <include file="$(find uml_hri_nerve_navigation)/launch/setup_test.launch">
+    <arg name="sim" value="$(arg sim)" />
     <arg name="gui" value="$(arg gui)" />
+    <arg name="navigate" value="$(arg navigate)" />
+    <arg name="3d" value="$(arg 3d)" />
+    <arg name="static_map" value="$(arg static_map)" />
     <arg name="robot" value="$(arg robot)" />
+    <arg name="goal_a_x" value="$(arg goal_a_x)" />
+    <arg name="goal_a_y" value="$(arg goal_a_y)" />
+    <arg name="goal_a_z" value="$(arg goal_a_z)" />
+    <arg name="goal_a_yaw" value="$(arg goal_a_yaw)" />
+    <arg name="goal_b_x" value="$(arg goal_b_x)" />
+    <arg name="goal_b_y" value="$(arg goal_b_y)" />
+    <arg name="goal_b_z" value="$(arg goal_b_z)" />
+    <arg name="goal_b_yaw" value="$(arg goal_b_yaw)" />
+    <arg name="world_name" value="$(arg world_name)" />
+    <arg name="world_path" value="$(arg world_path)" />
     <arg name="obstacle_bot" value="$(arg obstacle_bot)" />
     <arg name="dynamic_obstacle" value="$(arg dynamic_obstacle)" />
     <arg name="obstacle_name" value="$(arg obstacle_name)" />
     <arg name="flip_obstacle" value="$(arg flip_obstacle)" />
   </include>
-
-  <!-- Set a default spawn location for amcl to goal a if not in simulation -->
-  <group unless="$(arg sim)">
-    <param name="robot_spawn_x" value="$(arg goal_a_x)" />
-    <param name="robot_spawn_y" value="$(arg goal_a_y)" />
-    <param name="robot_spawn_z" value="$(arg goal_a_z)" />
-    <param name="robot_spawn_yaw" value="$(arg goal_a_yaw)" />
-  </group>
-
-  <!-- Setup loggers -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch">
-    <arg name="robot" value="$(arg robot)" />
-    <arg name="level" value="$(arg world_name)" />
-  </include>
-
-  <!-- Setup dord calculator if navigating in nerve_long_hall -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/dord_calculator.launch" if="$(eval world_name == 'nerve_long_hall')">
-    <arg name="robot" value="$(arg robot)" />
-    <arg name="level" value="$(arg world_name)" />
-    <arg name="goal_a_x" value="$(arg goal_a_x)" />
-    <arg name="goal_a_y" value="$(arg goal_a_y)" />
-    <arg name="goal_b_x" value="$(arg goal_b_x)" />
-    <arg name="goal_b_y" value="$(arg goal_b_y)" />
-    <arg name="obstacle_x" value="0.33057" />
-    <arg name="obstacle_y" value="12.40157" />
-  </include>
-
-  <!-- Setup robot -->
-  <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
-    <arg name="level" value="$(arg world_name)" />
-    <arg name="navigate" value="$(arg navigate)" />
-    <arg name="3d" value="$(arg 3d)" />
-    <arg name="static_map" value="$(arg static_map)" />
-  </include>
-
-  <!-- Setup obstacle bot if wanted -->
-  <group if="$(arg obstacle_bot)">
-    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_bot.launch" if="$(arg obstacle_bot)">
-      <arg name="level" value="$(arg world_name)" />
-      <arg name="navigate" value="$(arg navigate)" />
-    </include>
-
-    <group unless="$(arg sim)">
-      <param name="obstacle_bot_spawn_x" value="$(arg goal_b_x)" />
-      <param name="obstacle_bot_spawn_y" value="$(arg goal_b_y)" />
-      <param name="obstacle_bot_spawn_z" value="$(arg goal_b_z)" />
-      <param name="obstacle_bot_spawn_yaw" value="$(arg goal_b_yaw)" />
-    </group>
-
-    <!-- Set up global goal publisher for the obstacle_bot and invert goals-->
-    <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen">
-      <param name="goal_a_x" value="$(arg goal_b_x)" />
-      <param name="goal_a_y" value="$(arg goal_b_y)" />
-      <param name="goal_a_yaw" value="$(arg goal_b_yaw)" />
-      <param name="goal_b_x" value="$(arg goal_a_x)" />
-      <param name="goal_b_y" value="$(arg goal_a_y)" />
-      <param name="goal_b_yaw" value="$(arg goal_a_yaw)" />
-    </node>
-  </group>
 
   <!-- Start moving-->
   <node name="mover_node" pkg="uml_hri_nerve_navigation" type="mover_node" output="screen" required="true" launch-prefix="bash -c 'sleep $(arg start_test_delay); $0 $@' ">

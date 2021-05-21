@@ -1,3 +1,6 @@
+<!-- This launch file start the detected obstacle reaction distance (DORD) calculator.  This node determines how far away the robot is from an obstacle
+     when the robot detects the new obstacle -->
+
 <launch>
     <!-- Save the path for the logs using the current time -->
     <arg name="robot" />

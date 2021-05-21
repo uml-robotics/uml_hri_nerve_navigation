@@ -109,6 +109,7 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   * **sim (default: true)** - Int argument that specifies the number of times the robot will travel from goal A to goal B and back to goal A.
   * **gui (default: true)** - Boolean argument that specifies whether the robot's costmaps will be cleared in between each navigation goal.
   * **navigate (default: true)** - Boolean argument that specifies whether the robot should launch in navigation mode or in mapping mode.
+  * **static_map (default: true)** - Boolean argument that specifies whether the robot will use a static global map while navigating or use slam.
   * **3d (default: true)** - Boolean argument that specifies whether the robot should navigate with 3d sensors (rgbd cameras) or just with 2d sensors (LIDARs).
   * **robot (default: pioneer)** - String argument that specifies which robot to set up and spawn in if in simulation.
   * **goal_a_x (default: 0)** - Double argument that specifies the x coordinate for goal A.
@@ -138,9 +139,9 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   Example command for starting a test with 5 iterations, and the robot's costmaps will clear in between goals
   > roslaunch uml_hri_nerve_navigation start_test.launch iterations:=5 clear_costmaps:=true
 
-* **estop.launch** - A software emergency stop in case the robot gets out of control during a test.     
+* **estop.launch** - A software emergency stop in case the robot gets out of control during a test.       
 **Arguments:**
-  * none
+  * **namespace (default: "")** - String argument that specifies the namespace the estop node should run in.
 
   Example command for activing the estop for a robot that does not have a namespace
   >roslaunch uml_hri_nerve_navigation estop.launch

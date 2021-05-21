@@ -1,9 +1,10 @@
 /* 
-    The DORD calculator calculates the DORD metric on the nerve_long_hall map.  This node subscribes to a position topic for the robot and looks for when
-    the robot is traveling down the left aisle with the obstacle.  Then this node will save the position that gets the closest to the obstacle.  Finally 
-    the distance between the edge of the obstacle and the center of the robot is calculated and saved to csv log.  For this calculator to work, it assumes
-    that desired obstacle to calculate the distance on is the first observed obstacle when traveling from goal a to b and that the distance between the robot
-    and the obstacle is always decreasing when approaching the obstacle.
+    The detected obstacle reaction distance (DORD) calculator calculates the DORD metric on the nerve_long_hall map. This metric measures the distance 
+    between the pallet and the robot that the robot detects the obstacle and turns around. This node subscribes to a position topic for the robot and looks 
+    for when the robot is traveling down the left aisle with the obstacle.  Then this node will save the position that gets the closest to the obstacle. 
+    Finally the distance between the edge of the obstacle and the center of the robot is calculated and saved to csv log.  For this calculator to work,
+    it assumes that desired obstacle to calculate the distance on is the first observed obstacle when traveling from goal a to b and that the distance between 
+    the robot and the obstacle is always decreasing when approaching the obstacle.
 */
 
 #include <ros/ros.h>
