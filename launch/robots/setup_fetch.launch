@@ -6,6 +6,7 @@
   <arg name="level" default="level1" />
   <arg name="navigate" default="true" />
   <arg name="3d" default="true" />
+  <arg name="static_map" default="true" />
 
   <!-- robot determines the topics to be published, and serves as a identifier for Gazebo -->
   <arg name="robot" value="fetch" />
@@ -41,6 +42,7 @@
     <arg name="robot" value="$(arg robot)"/>
     <arg name="namespace" value="" />
     <arg name="level" value="$(arg level)" />
+    <arg name="static_map" value="$(arg static_map)" />
     <arg name="navigate" value="$(arg navigate)" />
     <arg name="3d" value="$(arg 3d)" />
     <arg name="laser_topic" value="$(arg laser_topic)" />

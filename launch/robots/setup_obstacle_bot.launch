@@ -4,8 +4,6 @@
 
   <!-- Settings (Robot position args are overidden by spawn_world.launch)-->
   <arg name="level" default="level1" />
-  <arg name="navigate" default="" /> <!-- Not used, just here to prevent extra arg errors -->
-  <arg name="3d" default="" /> <!-- Not used, just here to prevent extra arg errors -->
 
   <!-- robot determines the topics to be published, and serves as a unique identifier for Gazebo -->
   <arg name="robot" value="obstacle_bot"   />

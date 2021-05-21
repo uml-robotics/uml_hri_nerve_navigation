@@ -15,6 +15,6 @@
   </node>
 
   <!-- Start moving obstacle_bot if present-->
-  <node name="obstacle_bot_mover" pkg="uml_hri_nerve_navigation" type="obstacle_bot_node" ns="obstacle_bot" />
+  <node name="obstacle_bot_mover" pkg="uml_hri_nerve_navigation" type="obstacle_bot_node" ns="obstacle_bot" if="$(arg obstacle_bot)" />
 
 </launch>

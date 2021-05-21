@@ -12,6 +12,8 @@
   <!-- NOTE: move_base_config specifies the folder to find the .yaml config files for
        move_base. If you would like to safely play around with navigation settings,
        you can copy the default folder, rename it, then change move_base_config. -->
+
+  <!-- use a static map or use slam -->
   <arg name="use_static_map" default="true" />
 
   <!-- Robot topic and frame mappings-->

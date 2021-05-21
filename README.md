@@ -111,14 +111,14 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   * **navigate (default: true)** - Boolean argument that specifies whether the robot should launch in navigation mode or in mapping mode.
   * **3d (default: true)** - Boolean argument that specifies whether the robot should navigate with 3d sensors (rgbd cameras) or just with 2d sensors (LIDARs).
   * **robot (default: pioneer)** - String argument that specifies which robot to set up and spawn in if in simulation.
-  * **spawn_x (default: 0)** - Double argument that specifies the x coordinate for goal A.
-  * **spawn_y (default: 0)** - Double argument that specifies the y coordinate for goal A.
-  * **spawn_z (default: 0)** - Double argument that specifies the z coordinate for goal A.
-  * **spawn_yaw (default: 0)** - Double argument that specifies the yaw coordinate for goal A.
-  * **goal_x (default: 0)** - Double argument that specifies the x coordinate for goal B.
-  * **goal_y (default: 0)** - Double argument that specifies the y coordinate for goal B.
-  * **goal_z (default: 0)** - Double argument that specifies the z coordinate for goal B.
-  * **goal_yaw (default: 0)** - Double argument that specifies the yaw coordinate for goal B.
+  * **goal_a_x (default: 0)** - Double argument that specifies the x coordinate for goal A.
+  * **goal_a_y (default: 0)** - Double argument that specifies the y coordinate for goal A.
+  * **goal_a_z (default: 0)** - Double argument that specifies the z coordinate for goal A.
+  * **goal_a_yaw (default: 0)** - Double argument that specifies the yaw coordinate for goal A.
+  * **goal_b_x (default: 0)** - Double argument that specifies the x coordinate for goal B.
+  * **goal_b_y (default: 0)** - Double argument that specifies the y coordinate for goal B.
+  * **goal_b_z (default: 0)** - Double argument that specifies the z coordinate for goal B.
+  * **goal_b_yaw (default: 0)** - Double argument that specifies the yaw coordinate for goal B.
   * **world_name** - String argument that specifies the name of the static navigation map for the current environment.
   * **world_path** - String argument that specifies the file location of the .world file to set up in Gazebo relative to the uml_hri_nerve_nav_sim_resources/worlds folder.
   * **obstacle_bot (default: false)** - Boolean argument that specifes whether to set up an obstacle_bot or not

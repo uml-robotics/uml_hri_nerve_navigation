@@ -86,12 +86,12 @@ int main(int argc, char **argv){
   spawn_theta = 0.0;
 
   //Retrieve node parameters
-  n.getParam(ros::this_node::getName()+"/goal_x",goal_x);
-  n.getParam(ros::this_node::getName()+"/goal_y",goal_y);
-  n.getParam(ros::this_node::getName()+"/goal_theta",goal_theta);
-  n.getParam(ros::this_node::getName()+"/spawn_x",spawn_x);
-  n.getParam(ros::this_node::getName()+"/spawn_y",spawn_y);
-  n.getParam(ros::this_node::getName()+"/spawn_theta",spawn_theta);
+  n.getParam(ros::this_node::getName()+"/goal_b_x",goal_x);
+  n.getParam(ros::this_node::getName()+"/goal_b_y",goal_y);
+  n.getParam(ros::this_node::getName()+"/goal_b_yaw",goal_theta);
+  n.getParam(ros::this_node::getName()+"/goal_a_x",spawn_x);
+  n.getParam(ros::this_node::getName()+"/goal_a_y",spawn_y);
+  n.getParam(ros::this_node::getName()+"/goal_a_yaw",spawn_theta);
 
   //Display node information on startup
   ROS_INFO("GOAL_A | Point: (%.2f,%.2f)\tGOAL_B | Point: (%.2f,%.2f)",spawn_x,spawn_y,goal_x,goal_y);
