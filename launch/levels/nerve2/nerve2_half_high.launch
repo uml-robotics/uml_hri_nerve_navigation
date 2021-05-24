@@ -20,17 +20,6 @@
   <!-- Name and type of robot being spawned in -->
   <arg name="robot" default="fetch" />
 
-  <!-- Define the two goal points on the map-->
-  <arg name="goal_a_x" value="0.0" />
-  <arg name="goal_a_y" value="8.0" />
-  <arg name="goal_a_z" value="0.0" />
-  <arg name="goal_a_yaw" value="0.0" />
-
-  <arg name="goal_b_x" value="0.0" />
-  <arg name="goal_b_y" value="12.0" />
-  <arg name="goal_b_z" default="0"/>
-  <arg name="goal_b_yaw" default="0"/>
-
   <!-- Define map settings-->
   <arg name="world_name" value="nerve2_half_high" />
   <arg name="world_path" value="nerve2/$(arg world_name)" />
@@ -64,14 +53,6 @@
     <arg name="3d" value="$(arg 3d)" />
     <arg name="static_map" value="$(arg static_map)" />
     <arg name="robot" value="$(arg robot)" />
-    <arg name="goal_a_x" value="$(arg goal_a_x)" />
-    <arg name="goal_a_y" value="$(arg goal_a_y)" />
-    <arg name="goal_a_z" value="$(arg goal_a_z)" />
-    <arg name="goal_a_yaw" value="$(arg goal_a_yaw)" />
-    <arg name="goal_b_x" value="$(arg goal_b_x)" />
-    <arg name="goal_b_y" value="$(arg goal_b_y)" />
-    <arg name="goal_b_z" value="$(arg goal_b_z)" />
-    <arg name="goal_b_yaw" value="$(arg goal_b_yaw)" />
     <arg name="world_name" value="$(arg world_name)" />
     <arg name="world_path" value="$(arg world_path)" />
     <arg name="obstacle_bot" value="$(arg obstacle_bot)" />
@@ -88,14 +69,6 @@
     <arg name="3d" value="$(arg 3d)" />
     <arg name="static_map" value="$(arg static_map)" />
     <arg name="robot" value="$(arg robot)" />
-    <arg name="goal_a_x" value="$(arg goal_a_x)" />
-    <arg name="goal_a_y" value="$(arg goal_a_y)" />
-    <arg name="goal_a_z" value="$(arg goal_a_z)" />
-    <arg name="goal_a_yaw" value="$(arg goal_a_yaw)" />
-    <arg name="goal_b_x" value="$(arg goal_b_x)" />
-    <arg name="goal_b_y" value="$(arg goal_b_y)" />
-    <arg name="goal_b_z" value="$(arg goal_b_z)" />
-    <arg name="goal_b_yaw" value="$(arg goal_b_yaw)" />
     <arg name="world_name" value="$(arg world_name)" />
     <arg name="world_path" value="$(arg world_path)" />
     <arg name="obstacle_bot" value="$(arg obstacle_bot)" />

@@ -9,6 +9,7 @@
 
 #include <ros/ros.h>
 #include <math.h>
+#include <uml_hri_nerve_navigation/Goal.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -37,25 +38,23 @@ private:
 
     //Msgs
     geometry_msgs::PointStamped currentPosition;
-    geometry_msgs::Pose2D currentGoal;
+    geometry_msgs::Pose2D initialPosition;
 
     volatile float dordDistance;
 
     //dord distance timestamp
     ros::Time timestamp;
 
-    //Goal locations
-    float goal_a_x;
-    float goal_a_y;
-    float goal_b_x;
-    float goal_b_y;
+    //Names of goals that the robot is navigating to 
+    std::string goal;
 
     //Obstacle location
     float obstacle_x;
     float obstacle_y;
 
-    bool navigatingToGoalB;
+    bool navigatingToGoal;
     bool testActive;
+    bool newGoalRegistered;
 
     int currentDistanceBiggerThanDord;
 
@@ -70,21 +69,15 @@ public:
 
         dordDistance = 1000; //make it large since a minimum value is being found
 
-        navigatingToGoalB = false;
+        navigatingToGoal = false;
         testActive = false;
 
         currentDistanceBiggerThanDord = 0;
 
-        //Get the two goal locations and the location for the edge of the obstacle
-        n.getParam(ros::this_node::getName()+"/goal_a_x", goal_a_x);
-        n.getParam(ros::this_node::getName()+"/goal_a_y", goal_a_y);
-        n.getParam(ros::this_node::getName()+"/goal_b_x", goal_b_x);
-        n.getParam(ros::this_node::getName()+"/goal_b_y", goal_b_y);
+        //Get the two goal names and the location for the edge of the obstacle
+        n.getParam(ros::this_node::getName()+"/goal_name", goal);
         n.getParam(ros::this_node::getName()+"/obstacle_x", obstacle_x);
         n.getParam(ros::this_node::getName()+"/obstacle_y", obstacle_y);
-
-        ROS_WARN("Obstacle X: %f", obstacle_x);
-        ROS_WARN("Obstacle Y: %f", obstacle_y);
 
         //Get file path from parameter
         std::string file_path;
@@ -112,8 +105,8 @@ public:
             //Log the dord distance
             log_metric();
 
-            //Set navigatingToGoalB to false so the metric won't be calculated for the rest of the iteration
-            navigatingToGoalB = false;
+            //Set navigatingToGoal to false so the metric won't be calculated for the rest of the iteration
+            navigatingToGoal = false;
 
             //Reset Dord Distance
             dordDistance = 1000;
@@ -125,12 +118,13 @@ public:
     bool has_dord_metric_been_found()
     {
         //Test has to be active and the robot must be navigating to goal b to consider calculating the metric
-        if(testActive && navigatingToGoalB)
+        if(testActive && navigatingToGoal)
         {
-            //Check if the robot is still close to goal a.  If so, the robot can start off by moving away from the obstacle and cause a false positive
-            float goal_a_x_space = abs(goal_a_x - currentPosition.point.x);
-            float goal_a_y_space = abs(goal_a_y - currentPosition.point.y);
-            if(goal_a_x_space < 2 && goal_a_y_space < 2)
+            //Check if the robot is still close to its initial position.  If so, the robot can start off by moving away from the obstacle and cause 
+            //a false positive
+            float initial_x_space = abs(initialPosition.x - currentPosition.point.x);
+            float initial_y_space = abs(initialPosition.y - currentPosition.point.y);
+            if(initial_x_space < 2 && initial_y_space < 2)
             {
                 return false;
             }
@@ -172,6 +166,17 @@ public:
         currentPosition.point.x = pose.pose.position.x;
         currentPosition.point.y = pose.pose.position.y;
         currentPosition.header.stamp = pose.header.stamp;
+
+        //if the new goal was just registered, save the initial position
+        if(newGoalRegistered)
+        {
+            //save the initial position
+            initialPosition.x = pose.pose.position.x;
+            initialPosition.y = pose.pose.position.y;
+
+            //reset new goal boolean
+            newGoalRegistered = false;
+        }
     }
 
     //This function sets the current status of the test.  If a test is not active, don't bother calculating dord metric
@@ -181,21 +186,27 @@ public:
     }
 
     //This function recieves the current goal and determines if the robot is navigating toward goal b
-    void check_if_navigating_toward_goal_b(geometry_msgs::Pose2D current_goal)
+    void navigating_toward_desired_goal(uml_hri_nerve_navigation::Goal current_goal)
     {
-        //Find the space between the current goal coordinates and goal b's coordinates
-        float goal_b_x_space = abs(goal_b_x - current_goal.x);
-        float goal_b_y_space = abs(goal_b_y - current_goal.y);
+        //Find if the current goal's description matches the description for the desired goal
+        if(std::strcmp(goal.c_str(), current_goal.description.c_str()) == 0)
+        {
+            navigatingToGoal = true;
+        }
+        else
+        {
+            navigatingToGoal = false;
+        }
 
-        //Check if the current goal is goal b
-        navigatingToGoalB = goal_b_x_space < 0.2 && goal_b_y_space < 0.2;
+        //Update new goal boolean
+        newGoalRegistered = true;
     }
 
     //This functions checks if the robot has stopped navigating and automatically sets the navigating to goal b status to false if not navigating
     void set_current_navigation_status(bool is_navigating)
     {
         if(!is_navigating)
-            navigatingToGoalB = false;
+            navigatingToGoal = false;
     }
 
     void log_metric()
@@ -218,9 +229,9 @@ void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose)
     calculator->update_current_position(*pose);
 }
 
-void goal_callback(const geometry_msgs::Pose2D::ConstPtr &goal)
+void goal_callback(const uml_hri_nerve_navigation::Goal::ConstPtr &goal)
 {
-    calculator->check_if_navigating_toward_goal_b(*goal);
+    calculator->navigating_toward_desired_goal(*goal);
 }
 
 void state_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr &state)
@@ -248,7 +259,7 @@ int main(int argc, char **argv)
 
     // Setup subscribers
     ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
-    ros::Subscriber goal_sub = n.subscribe("/goal", 10, goal_callback);
+    ros::Subscriber goal_sub = n.subscribe("goal", 10, goal_callback);
     ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);
     ros::Subscriber test_status = n.subscribe("/test_status", 10, test_status_callback);
 

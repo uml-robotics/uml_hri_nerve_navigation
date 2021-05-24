@@ -19,17 +19,6 @@
   <!-- Type of robot being spawned in -->
   <arg name="robot" default="pioneer" />
 
-  <!-- Define the two goal points and two obstacle spawn points on the map, values are set in the level launch files-->
-  <arg name="goal_a_x" default="0" />
-  <arg name="goal_a_y" default="0" />
-  <arg name="goal_a_z" default="0" />
-  <arg name="goal_a_yaw" default="0" />
-
-  <arg name="goal_b_x" default="0" />
-  <arg name="goal_b_y" default="0" />
-  <arg name="goal_b_z" default="0" />
-  <arg name="goal_b_yaw" default="0" />
-
   <!-- Define map settings, values are set in the level launch files-->
   <arg name="world_name" />
   <arg name="world_path" />
@@ -63,14 +52,6 @@
     <arg name="3d" value="$(arg 3d)" />
     <arg name="static_map" value="$(arg static_map)" />
     <arg name="robot" value="$(arg robot)" />
-    <arg name="goal_a_x" value="$(arg goal_a_x)" />
-    <arg name="goal_a_y" value="$(arg goal_a_y)" />
-    <arg name="goal_a_z" value="$(arg goal_a_z)" />
-    <arg name="goal_a_yaw" value="$(arg goal_a_yaw)" />
-    <arg name="goal_b_x" value="$(arg goal_b_x)" />
-    <arg name="goal_b_y" value="$(arg goal_b_y)" />
-    <arg name="goal_b_z" value="$(arg goal_b_z)" />
-    <arg name="goal_b_yaw" value="$(arg goal_b_yaw)" />
     <arg name="world_name" value="$(arg world_name)" />
     <arg name="world_path" value="$(arg world_path)" />
     <arg name="obstacle_bot" value="$(arg obstacle_bot)" />

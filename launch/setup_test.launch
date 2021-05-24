@@ -19,17 +19,6 @@
   <!-- Type of robot being spawned in -->
   <arg name="robot" default="pioneer" />
 
-  <!-- Define the two goal points and two obstacle spawn points on the map, values are set in the level launch files-->
-  <arg name="goal_a_x" default="0" />
-  <arg name="goal_a_y" default="0" />
-  <arg name="goal_a_z" default="0" />
-  <arg name="goal_a_yaw" default="0" />
-
-  <arg name="goal_b_x" default="0" />
-  <arg name="goal_b_y" default="0" />
-  <arg name="goal_b_z" default="0" />
-  <arg name="goal_b_yaw" default="0" />
-
   <!-- Define map settings, values are set in the level launch files-->
   <arg name="world_name" />
   <arg name="world_path" />
@@ -47,13 +36,8 @@
   <arg name="flip_obstacle" default="true" />
 
   <!-- Set up global goal publisher -->
-  <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen">
-    <param name="goal_a_x" value="$(arg goal_a_x)" />
-    <param name="goal_a_y" value="$(arg goal_a_y)" />
-    <param name="goal_a_yaw" value="$(arg goal_a_yaw)" />
-    <param name="goal_b_x" value="$(arg goal_b_x)" />
-    <param name="goal_b_y" value="$(arg goal_b_y)" />
-    <param name="goal_b_yaw" value="$(arg goal_b_yaw)" />
+  <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher">
+    <param name="file_path" value="$(find uml_hri_nerve_navigation)/goals/$(arg world_name)/goals.csv"/>
   </node>
 
   <!-- Setup the simulation if the test is being performed in simulation -->
@@ -68,10 +52,10 @@
 
   <!-- Set a default spawn location for amcl to goal a if not in simulation -->
   <group unless="$(arg sim)">
-    <param name="robot_spawn_x" value="$(arg goal_a_x)" />
-    <param name="robot_spawn_y" value="$(arg goal_a_y)" />
-    <param name="robot_spawn_z" value="$(arg goal_a_z)" />
-    <param name="robot_spawn_yaw" value="$(arg goal_a_yaw)" />
+    <param name="robot_spawn_x" value="0" />
+    <param name="robot_spawn_y" value="0" />
+    <param name="robot_spawn_z" value="0" />
+    <param name="robot_spawn_yaw" value="0" />
   </group>
 
   <!-- Setup loggers -->
@@ -84,10 +68,7 @@
   <include file="$(find uml_hri_nerve_navigation)/launch/dord_calculator.launch" if="$(eval world_name == 'nerve_long_hall')">
     <arg name="robot" value="$(arg robot)" />
     <arg name="level" value="$(arg world_name)" />
-    <arg name="goal_a_x" value="$(arg goal_a_x)" />
-    <arg name="goal_a_y" value="$(arg goal_a_y)" />
-    <arg name="goal_b_x" value="$(arg goal_b_x)" />
-    <arg name="goal_b_y" value="$(arg goal_b_y)" />
+    <arg name="goal" value="goal_b" />
     <arg name="obstacle_x" value="0.33057" />
     <arg name="obstacle_y" value="12.40157" />
   </include>
@@ -108,20 +89,15 @@
     </include>
 
     <group unless="$(arg sim)">
-      <param name="obstacle_bot_spawn_x" value="$(arg goal_b_x)" />
-      <param name="obstacle_bot_spawn_y" value="$(arg goal_b_y)" />
-      <param name="obstacle_bot_spawn_z" value="$(arg goal_b_z)" />
-      <param name="obstacle_bot_spawn_yaw" value="$(arg goal_b_yaw)" />
+      <param name="obstacle_bot_spawn_x" value="0" />
+      <param name="obstacle_bot_spawn_y" value="0" />
+      <param name="obstacle_bot_spawn_z" value="0" />
+      <param name="obstacle_bot_spawn_yaw" value="0" />
     </group>
 
     <!-- Set up global goal publisher for the obstacle_bot and invert goals-->
-    <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" output="screen">
-      <param name="goal_a_x" value="$(arg goal_b_x)" />
-      <param name="goal_a_y" value="$(arg goal_b_y)" />
-      <param name="goal_a_yaw" value="$(arg goal_b_yaw)" />
-      <param name="goal_b_x" value="$(arg goal_a_x)" />
-      <param name="goal_b_y" value="$(arg goal_a_y)" />
-      <param name="goal_b_yaw" value="$(arg goal_a_yaw)" />
+    <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" ns="obstacle_bot">
+      <param name="file_path" value="$(find_uml_uml_hri_nerve_navigation)/goals/$(arg world_name)/obstacle_bot_goals.csv"/>
     </node>
   </group>
 

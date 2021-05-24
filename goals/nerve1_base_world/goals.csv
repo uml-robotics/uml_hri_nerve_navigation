@@ -1,0 +1,5 @@
+Goal Description,X Position,Y Position,Theta
+goal_a,0,4,0
+goal_b,0,8,0
+goal_c,6,0,1.57
+goal_d,6,12,0

@@ -6,99 +6,154 @@
 
 #include <ros/ros.h>
 #include <string>
+#include <sstream>
 #include <std_srvs/Empty.h>
 #include <geometry_msgs/Pose2D.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <uml_hri_nerve_navigation/Goal.h>
+#include <boost/algorithm/string.hpp>
+#include <stdexcept>
 
-ros::Publisher goal_pub;
-int counter;
-float goal_x;
-float goal_y;
-float goal_theta;
-float spawn_x;
-float spawn_y;
-float spawn_theta;
-float goal_tolerance;
+class GoalManager
+{
+private:
+  std::vector<uml_hri_nerve_navigation::Goal> goalArray;
+  std::ifstream csvFile;
+
+  ros::Publisher goal_pub;
+  int counter;
+
+  void parseCsvFile()
+  {
+    std::string csvLine;
+
+    //Read the line since the header is useless
+    std::getline(csvFile, csvLine);
+
+    //The all of the following lines and split each line by the commas
+    while (std::getline(csvFile, csvLine))
+    {
+      //Make sure that the line read is not empty and causes the split function call to cause an error
+      if (!csvLine.empty())
+      {
+        //seperates the lines by the commas
+        std::vector<std::string> data;
+        boost::algorithm::split(data, csvLine, boost::is_any_of(","));
+
+        //parse the seperated strings into the goal msg
+        uml_hri_nerve_navigation::Goal goal;
+        goal.description = data[0];
+        goal.goal.x = std::stod(data[1].c_str());
+        goal.goal.y = std::stod(data[2].c_str());
+        goal.goal.theta = std::stod(data[3].c_str());
+
+        ROS_INFO("Goal: %s registered at x:%f, y:%f and yaw:%f", goal.description.c_str(), goal.goal.x, goal.goal.y, goal.goal.theta);
+
+        //Add the goal to the goal vector
+        goalArray.push_back(goal);
+      }
+    }
+  }
+
+public:
+  GoalManager(ros::NodeHandle n)
+  {
+    //Get file location
+    std::string file_location;
+    n.getParam(ros::this_node::getName() + "/file_path", file_location);
+
+    //Open the file
+    csvFile.open(file_location.c_str());
+
+    //Check if the file is valid
+    if (!csvFile)
+    {
+      ROS_ERROR("Unable to open goal file");
+      throw std::invalid_argument("Invalid file name");
+    }
+
+    //parse the file
+    parseCsvFile();
+
+    //Close the file
+    csvFile.close();
+
+    //After parsing all of the goals, set the total number of goals inside all of the goal msgs
+    for(int i = 0; i < goalArray.size(); i++)
+    {
+      goalArray[i].total_goals = goalArray.size();
+    }
+
+    //Create the publisher object
+    goal_pub = n.advertise<uml_hri_nerve_navigation::Goal>("goal", 1, true);
+
+    //Set counter to equal 1 so the first goal published by publishNextGoal is not the spawn location
+    counter = 1;
+  }
+
+  //Publishes the next goal in the goal array. The goals wrap around to the beginning of the array after the last goal is published
+  void publishNextGoal()
+  {
+    //Determine what is the current goal
+    int currentGoalIndex = counter % goalArray.size();
+
+    //Publish the goal
+    goal_pub.publish(goalArray[currentGoalIndex]);
+    ROS_INFO("Published goal: %s", goalArray[currentGoalIndex].description.c_str());
+
+    //Increase count to get the next goal
+    counter++;
+  }
+
+  //Publishes the first goal in the goal array
+  void publishInitialGoal()
+  {
+    //Publish the goal
+    goal_pub.publish(goalArray[0]);
+    ROS_INFO("Published initial goal: %s", goalArray[0].description.c_str());
+  }
+
+  //Resets the counter back to 1
+  void resetGoals()
+  {
+    counter = 1;
+    ROS_INFO("Goal publisher order reset to beginning");
+  }
+};
+
+GoalManager *goalManager;
+
+//Service Callbacks
 
 bool newGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
-  geometry_msgs::Pose2D goal;
-
-  //Determines which goal needs to be published
-  if(counter % 2 == 0)
-  {
-    //Set the goal to the original goal coords
-    goal.x = goal_x;                  
-    goal.y = goal_y;
-    goal.theta = goal_theta;
-  }
-  else
-  {
-    //Set the goal to the original spawn coords
-    goal.x = spawn_x;                  
-    goal.y = spawn_y;
-    goal.theta = spawn_theta;
-  }
-
-  //Publish the goal
-  goal_pub.publish(goal);
-
-  //Increase count to alternate goals
-  counter++;
-  
+  goalManager->publishNextGoal();
   return true;
 }
 
 bool initialGoalCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
-  geometry_msgs::Pose2D startingPosition;
-
-  //Set the initial position
-  startingPosition.x = spawn_x;                  
-  startingPosition.y = spawn_y;
-  startingPosition.theta = spawn_theta;
-
-  //Publish the initial position on the goal topic so the robot navigates to the initial position
-  goal_pub.publish(startingPosition);
-  
+  goalManager->publishInitialGoal();
   return true;
 }
 
 bool resetGoalsCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
-  //Reset counter so the next time get_new_goal is called, the goal topic will publish the goal parameters
-  counter = 0;
-
+  goalManager->resetGoals();
   return true;
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   //Create ros node
   ros::init(argc, argv, "goal_publisher");
   ros::NodeHandle n;
 
-  //Set default values
-  counter = 0;
-  goal_x = 0.0;
-  goal_y = 0.0;
-  goal_theta = 0.0;
-  spawn_x = 0.0;
-  spawn_y = 0.0;
-  spawn_theta = 0.0;
+  //create a goalManager object
+  goalManager = new GoalManager(n);
 
-  //Retrieve node parameters
-  n.getParam(ros::this_node::getName()+"/goal_b_x",goal_x);
-  n.getParam(ros::this_node::getName()+"/goal_b_y",goal_y);
-  n.getParam(ros::this_node::getName()+"/goal_b_yaw",goal_theta);
-  n.getParam(ros::this_node::getName()+"/goal_a_x",spawn_x);
-  n.getParam(ros::this_node::getName()+"/goal_a_y",spawn_y);
-  n.getParam(ros::this_node::getName()+"/goal_a_yaw",spawn_theta);
-
-  //Display node information on startup
-  ROS_INFO("GOAL_A | Point: (%.2f,%.2f)\tGOAL_B | Point: (%.2f,%.2f)",spawn_x,spawn_y,goal_x,goal_y);
-
-  //Create the publisher object
-  goal_pub = n.advertise<geometry_msgs::Pose2D>("goal", 1, true);
-  
   //Create the service callbacks
   ros::ServiceServer goal_server = n.advertiseService("get_new_goal", newGoalCallback);
   ros::ServiceServer initial_goal_server = n.advertiseService("get_initial_goal", initialGoalCallback);
@@ -106,6 +161,11 @@ int main(int argc, char **argv){
 
   //Keeps the node running and perform necessary updates
   ros::spin();
+
+  //Delete the goalManager object
+  delete goalManager;
+
+  ROS_WARN("object deleted");
 
   return 0;
 }

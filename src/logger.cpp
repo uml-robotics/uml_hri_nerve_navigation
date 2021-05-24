@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>
+#include <uml_hri_nerve_navigation/Goal.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
@@ -173,13 +174,13 @@ public:
         }
     }
 
-    void add_goal(geometry_msgs::Pose2D goal)
+    void add_goal(uml_hri_nerve_navigation::Goal goal)
     {
         if (!navigating && test_active)
         {
             //Save goal pos
-            log.goal.x = goal.x;
-            log.goal.y = goal.y;
+            log.goal.x = goal.goal.x;
+            log.goal.y = goal.goal.y;
 
             //Change nav and publish state
             navigating = true;
@@ -193,10 +194,10 @@ public:
 
             //Add msg log
             std::stringstream str;
-            str << "Goal registered at x:" << goal.x << " y:" << goal.y;
+            str << "Goal: " << goal.description << " registered at x:" << goal.goal.x << " y:" << goal.goal.y;
             log.event = str.str();
             ROS_INFO("Starting iteration %d", log.iteration);
-            ROS_INFO("Goal registered at x:%.3f y:%.3f", goal.x, goal.y);
+            ROS_INFO("Goal: %s registered at x:%.3f y:%.3f", goal.description.c_str(), goal.goal.x, goal.goal.y);
         }
     }
 
@@ -286,7 +287,7 @@ void collision_callback(const gazebo_msgs::ContactsState::ConstPtr &collision)
     logger->add_collision(*collision);
 }
 
-void goal_callback(const geometry_msgs::Pose2D::ConstPtr &goal)
+void goal_callback(const uml_hri_nerve_navigation::Goal::ConstPtr &goal)
 {
     logger->add_goal(*goal);
 }
@@ -322,7 +323,7 @@ int main(int argc, char **argv)
     // Setup subscribers
     ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
-    ros::Subscriber goal_sub = n.subscribe("/goal", 10, goal_callback);
+    ros::Subscriber goal_sub = n.subscribe("goal", 10, goal_callback);
     ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);
     ros::Subscriber test_status = n.subscribe("/test_status", 10, test_status_callback);
 

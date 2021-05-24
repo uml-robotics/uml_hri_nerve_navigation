@@ -1,8 +1,8 @@
-//Same thing as mover, but it never stops requesting for goals
+//Same thing as mover, but it never stops requesting for goals and does not bother with navigating toward its initial goal
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
-#include <geometry_msgs/Pose2D.h>
+#include <uml_hri_nerve_navigation/Goal.h>
 #include <std_srvs/Empty.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
@@ -14,22 +14,23 @@ MoveBaseClient *ac;
 ros::ServiceClient costmap_service;
 ros::ServiceClient goal_service;
 
-void goalCallback(geometry_msgs::Pose2D goal_msg)
+void goalCallback(uml_hri_nerve_navigation::Goal goal_msg)
 {
   move_base_msgs::MoveBaseGoal goal;
 
   //translate Goal Message to a MoveBaseGoal
   goal.target_pose.header.frame_id = "/map";
   goal.target_pose.header.stamp = ros::Time::now();
-  goal.target_pose.pose.position.x = goal_msg.x;
-  goal.target_pose.pose.position.y = goal_msg.y;
+  goal.target_pose.pose.position.x = goal_msg.goal.x;
+  goal.target_pose.pose.position.y = goal_msg.goal.y;
   tf2::Quaternion angle;
-  angle.setRPY(0, 0, goal_msg.theta);
+  angle.setRPY(0, 0, goal_msg.goal.theta);
   goal.target_pose.pose.orientation.z = angle.getZ();
   goal.target_pose.pose.orientation.w = angle.getW();
 
   //Send the goal to the navigation action client
   ac->sendGoal(goal);
+  ROS_INFO("Obstacle bot starting navigation toward goal: %s", goal_msg.description.c_str());
 
   //Wait for the robot to finish moving
   ac->waitForResult();

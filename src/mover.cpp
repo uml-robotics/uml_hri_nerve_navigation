@@ -12,7 +12,7 @@
 #include <std_srvs/Empty.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
-#include <geometry_msgs/Pose2D.h>
+#include <uml_hri_nerve_navigation/Goal.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -29,25 +29,25 @@ int iterations;
 bool clear_costmaps;
 bool initial_setup;
 
-void goalCallback(geometry_msgs::Pose2D::ConstPtr goal_msg_pointer)
+void goalCallback(uml_hri_nerve_navigation::Goal goal_msg)
 {
-    geometry_msgs::Pose2D goal_msg = *goal_msg_pointer;
     move_base_msgs::MoveBaseGoal goal;
+    //save # of total goals for checking if all the goals have been navigated to in a given iteration
+    unsigned int total_goals_in_iteration = goal_msg.total_goals;
 
     //translate Goal Message to a MoveBaseGoal
     goal.target_pose.header.frame_id = "/map";
     goal.target_pose.header.stamp = ros::Time::now();
-    goal.target_pose.pose.position.x = goal_msg.x;
-    goal.target_pose.pose.position.y = goal_msg.y;
+    goal.target_pose.pose.position.x = goal_msg.goal.x;
+    goal.target_pose.pose.position.y = goal_msg.goal.y;
     tf2::Quaternion angle;
-    angle.setRPY(0, 0, goal_msg.theta);
+    angle.setRPY(0, 0, goal_msg.goal.theta);
     goal.target_pose.pose.orientation.z = angle.getZ();
     goal.target_pose.pose.orientation.w = angle.getW();
 
-    ROS_WARN("%f", goal_msg.x);
-
     //Send the goal to the navigation action client
     ac->sendGoal(goal);
+    ROS_INFO("Starting navigation toward goal: %s", goal_msg.description.c_str());
 
     //Wait 1 second before checking nav status so for cases that instantly finish navigating, the code still holds for at least 1 sec
     ros::Duration(1).sleep();
@@ -77,7 +77,7 @@ void goalCallback(geometry_msgs::Pose2D::ConstPtr goal_msg_pointer)
         goals_reached++;
 
         //Requests another goal if the number of trips has not been met, otherwise shut down the node
-        if (goals_reached / 2 < iterations)
+        if (goals_reached / total_goals_in_iteration < iterations)
         {
             //Get the next goal
             if (!goal_service.call(service_msg))
