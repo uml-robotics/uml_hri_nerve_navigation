@@ -2,11 +2,11 @@
 # UML HRI Nerve Navigation
 
 ## About:
-  The UML HRI Nerve Navigation package is used for performing several navigation tests that help quantify important characteristics of a navigating robot. Examples of these characteristics include the performance of a robot's path planner and the peformance of a robot's obstacle detection algorithms. A navigation test consists of an environment with two goals, goals A and B. The robot will start the test at goal A and then attempts to navigate to goal B.  Once the robot reaches goal B or the robot decides it cannot reach goal B, the robot will attempt to navigate back to goal A.  A single iteration of a navigation test will be completed once the robot either reaches or gives up navigating to goal A. To measure the repeatability of the robot's performance, a full navigation test will consist of multiple iterations of the robot traveling from goal A to goal B and back to goal A. After the test is complete, characteristics of a navigating robot can be found by comparing the robot's performace to the theoretical performance or the performace of a difference robot that completed  the same test. Depending on the configuration of the environement, different characteristics can be more easily measured than others.  For example, if one wanted to measure how well a robot can avoid small obstacles, small cubes can be inserted into the navigation environment.  The image below shows an example of a navigation test environment.
+  The UML HRI Nerve Navigation package is used for performing several navigation tests that help quantify important characteristics of a navigating robot. Examples of these characteristics include the performance of a robot's path planner and the peformance of a robot's obstacle detection algorithms. A navigation test consists of an environment with a set of goals. The robot will start the test at a starting goal and then navigate to the rest of the goals in sequential order.  A single iteration of a navigation test will be completed once the robot navigates back to the starting goal. To measure the repeatability of the robot's performance, a full navigation test will consist of multiple iterations of the robot traveling to all of the goals and then back to the starting goal. After the test is complete, characteristics of a navigating robot can be found by comparing the robot's performace to the theoretical performance or the performace of a difference robot that completed  the same test. Depending on the configuration of the environement, different characteristics can be more easily measured than others.  For example, if one wanted to measure how well a robot can avoid small obstacles, small cubes can be inserted into the navigation environment.  The image below shows an example of a navigation test environment with two goals, A and B.
   
   ![Example Test Environment](resources/screenshots/test_setup.png) 
 
-## Setup:
+## Package Setup:
 1. Clone this repository into your catkin workspace.
   > cd ~/<your_ws>/src   
   > git clone https://github.com/uml-robotics/uml_hri_nerve_navigation.git 
@@ -42,7 +42,18 @@ There are two main ways to run a test:
     > roslaunch uml_hri_nerve_navigation level4.launch start_test:=false sim:=true robot:=fetch
 
     Then following command starts a navigation test with 20 iterations.
-    > roslaunch uml_hri_nerve_navigation start_test.launch start_test:=true sim:=true robot:=fetch iterations:=10
+    > roslaunch uml_hri_nerve_navigation start_test.launch start_test:=true sim:=true robot:=fetch iterations:=10   
+
+**Note:** If you running a physical test, the amcl node will initialize to the coordinate (0,0) which is probably not where the robot is actually located. To fix this, launch a world file with start_test set to false and before starting the test, use the approximate position tool in RViz to initialize the robot to the correct location.
+
+## Defining Test Goals:
+The robots can be configured to navigate to multiple goal locations in a given test.  To set the goals for a navigation test:
+1. Create a folder in the goals folder and name the folder whatever the world_name argument is in the desired environment's launch file
+2. Create two CSV files, the first one called goals.csv and the second one called obstacle_bot_goals.csv.  Goals.csv defines goals for the main test robot to follow and obstacle_bot_goals.csv defines goals for the obstacle bot to follow.
+3. Launch the desired world with the start_test argument set to false and launch RViz. Then, in another terminal, run a rostopic echo on the /clicked_point topic. Using the publish point tool, click desired goal locations on the map and record the coordinates for the point that are displayed in the terminal running the rostopic echo command.
+4. In the CSV files, column 1 defines the goal names, column 2 defines the x coordinates, column 3 defines the y coordinates, and column 4 defines the goal yaws. When the goal_publisher node reads the file, the first row is ignored, so feel free to add headers for the columns or just leave the first row blank.  Rows 2 and on will define a new goal for the robot to navigate to. The robot will navigate to the goals from top to bottom in the order defined by the CSV.  Thus, the starting goal for the test will be the goal defined in row 2 of the CSV file.
+5. If you need an example to refer to, look at the maps that already have goals defines such as nerve1_base_world.
+
 
 ## Stopping the Test:
 If the level launch file is run with the start_test argument set to true, then the launch file will automatically stop running once the test finishes.  If the level launch file is run with the start_test argument set to false, the start_test launch file will automatically stop running once the test finishes, but the level launch file needs to be closed manually with 'Ctrl+c'.
@@ -57,14 +68,17 @@ If in simulation and the robot gets stuck or leaves the desired navigation area,
 1. **Creating a Gazebo world in the UML HRI Nerve Nav Sim Resources package if the environment is going to be simulated**  
 For more information on adding a simulated world to the UML HRI Nerve Nav Sim Resources package, refer to the UML HRI Nerve Nav Sim Resources documentation
 2. **Creating a navigation map**    
-Launch the setup_test.launch file specifing the world_path if in simulation and set the navigation argument to false.  By setting the navigation argument to false, the robot will launch all of the necessary nodes to perform navigation mapping.  The robot will automatically generate a map by using the robot's sensor data, but the robot must move throughout the entire environment in order to map the entire environemnt.  To move the robot, follow the terminal instructions to move the robot around using a keyboard.  When mapping, it is recommended to launch rviz to view the current map and ensure that there are not any chuncks missing from the map.
+Launch the setup_test.launch file specifing the world_path if in simulation and set the navigation argument to false.  By setting the navigation argument to false, the robot will launch all of the necessary nodes to perform navigation mapping.  The robot will automatically generate a map by using the robot's sensor data, but the robot must move throughout the entire environment in order to map the entire environemnt.  To move the robot, follow the terminal instructions to move the robot around using a keyboard.  When mapping, it is recommended to launch RViz to view the current map and ensure that there are not any chuncks missing from the map.
 3. **Save the maps after mapping the entire environment**    
 Launch the save_maps.launch file specifing the map_name argument as the name for the current environment.
+4. **Defining test goals**    
+To define goals for a test inside a given environment, follow the instructions provided under the Defining Test Goals section.
 
 ## Adding a New Robot:
   TODO
 
 ## File Structure:  
+* **goals/** - Defines all of the navigation goals for each environment.
 * **launch/** - Contains all necessary ROS .launch files.  
   * **levels/** - Contains all of the .launch files for setting up the various navigation environments.
   * **navigation/** - Contains all of the .launch files used for navigation.
@@ -78,12 +92,12 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
     * **2d/** - Contains 2d maps used by map_server
     * **3d/** - Contains octomaps used by octomap_server    
 * **src/** - Contains all c++ source files.  
+  * **dord_calculator.cpp** - Calculates and logs the DORD metric on the nerve_long_hall map
   * **estop.cpp** - Publishes zero velocity on the /cmd_vel topic at a fast rate in case of an emergency
-  * **goal_pub.cpp** - Publishes the A and B goal point on the /goal and /goal_opposite topics and alternates the goal points after the robot reaches the goal it was navigating to.
+  * **goal_pub.cpp** - Reads the navigation goals defined in goal CSV files and publishes the current navigation goal on the /goal topic.  Also provides services to be able to change the current goal and reset the goal order.
+  * **logger.cpp** - Logs various robot data used to evaluate navigation tests.
   * **mover.cpp** - Reads the current goal on the /goal topic and commands the navigation stack to move to that goal.  
   * **obstacle_bot.cpp** - Commands the obstacle bot to move to various goals.
-  * **logger.cpp** - Logs various robot data used to evaluate navigation tests.
-  * **goal_pub.cpp** - Publishes a goal on the /goal topic.
   * **setup_fetch.cpp** - Resets Fetch's current state into a state that is state for navigation - TODO
 * **run_test.sh** - A script that automatically launches and performs a test
 ## Important Launch Files:    
@@ -138,12 +152,12 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
   Example command for activing the estop for a robot that does not have a namespace
   >roslaunch uml_hri_nerve_navigation estop.launch
 
-* **rviz.launch** - Launches RVIZ with a default configuration that displays most of the important components used in the tests.  Each robot has a unique RVIZ configuration and the desired robot configuration is specified in the launch command.    
+* **rviz.launch** - Launches RViz with a default configuration that displays most of the important components used in the tests.  Each robot has a unique RViz configuration and the desired robot configuration is specified in the launch command.    
 **Arguments:**
-  * **robot (default: "")** - String argument that specifies which robot config to launch. If the argument is empty, a default rviz config will launch
+  * **robot (default: "")** - String argument that specifies which robot config to launch. If the argument is empty, a default RViz config will launch
   * **config_file (default: "config")** - String argument that specifies the name of the config files.  
 
-  Example command for launching rviz for the pioneer robot
+  Example command for launching RViz for the pioneer robot
   >roslaunch uml_hri_nerve_navigation rviz.launch robot:=pioneer
 
 * **setup_<Desired_Robot>.launch** - Sets up the robot that is being used in the test.  If the test is in simulation and Gazebo is running, the robot will be spawned into the Gazebo environment, otherwise the necessary setup to run a physical robot will be performed.  This launch file includes a launch file inside of the /launch/robots folder depending on which robot is being used and whether the test is in simulation or not.     
