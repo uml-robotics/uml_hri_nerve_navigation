@@ -83,10 +83,7 @@
 
   <!-- Setup obstacle bot if wanted -->
   <group if="$(arg obstacle_bot)">
-    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_bot.launch" if="$(arg obstacle_bot)">
-      <arg name="level" value="$(arg world_name)" />
-      <arg name="navigate" value="$(arg navigate)" />
-    </include>
+    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_obstacle_bot.launch" if="$(arg obstacle_bot)" />
 
     <group unless="$(arg sim)">
       <param name="obstacle_bot_spawn_x" value="0" />
@@ -97,7 +94,7 @@
 
     <!-- Set up global goal publisher for the obstacle_bot and invert goals-->
     <node name="goal_publisher" pkg="uml_hri_nerve_navigation" type="goal_publisher" ns="obstacle_bot">
-      <param name="file_path" value="$(find_uml_uml_hri_nerve_navigation)/goals/$(arg world_name)/obstacle_bot_goals.csv"/>
+      <param name="file_path" value="$(find uml_hri_nerve_navigation)/goals/$(arg world_name)/obstacle_bot_goals.csv"/>
     </node>
   </group>
 
