@@ -10,7 +10,7 @@
     args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map).bt">
     <remap from="cloud_in" to="pointcloud_static_octomap_ignore" />
     <param name="base_frame_id" value="$(arg base_link)" />
-    <param name="frame_id" type="string" value="/map" />
+    <param name="frame_id" type="string" value="map" />
     <param name="occupancy_min_z" value="0.23" />
     <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/robot_dimensions.yaml" command="load" />
   </node>
@@ -20,7 +20,7 @@
     args="$(find uml_hri_nerve_navigation)/resources/static_maps/3d/$(arg map).bt">
     <remap from="cloud_in" to="pointcloud_static_octomap_ignore" />
     <param name="base_frame_id" value="$(arg base_link)" />
-    <param name="frame_id" type="string" value="/map" />
+    <param name="frame_id" type="string" value="map" />
     <param name="occupancy_max_z" value="-0.23" />
     <param name="occupancy_min_z" value="-10" />
 

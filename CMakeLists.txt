@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_srvs
   geometry_msgs
   tf2
+  tf2_ros
   message_generation
   move_base_msgs
   actionlib
@@ -116,6 +117,8 @@ catkin_package(
     roscpp 
     std_msgs 
     std_srvs 
+    tf2
+    tf2_ros
     geometry_msgs 
     message_runtime 
     move_base_msgs 
@@ -155,6 +158,7 @@ add_executable(obstacle_bot_node src/obstacle_bot.cpp)
 add_executable(logger src/logger.cpp)
 add_executable(estop src/estop.cpp)
 add_executable(dord_calculator src/dord_calculator.cpp)
+add_executable(pose_publisher src/pose_publisher.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -171,6 +175,7 @@ add_dependencies(obstacle_bot_node ${obstacle_bot_node_EXPORTED_TARGETS} ${catki
 add_dependencies(logger ${logger_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(estop ${estop_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(dord_calculator ${dord_calculator_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(pose_publisher ${pose_publisher_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -192,6 +197,9 @@ target_link_libraries(estop
   ${catkin_LIBRARIES}
 )
 target_link_libraries(dord_calculator
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(pose_publisher
   ${catkin_LIBRARIES}
 )
 

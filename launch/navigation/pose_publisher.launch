@@ -1,12 +1,11 @@
 <launch>
-    <!-- Docs: https://wiki.ros.org/robot_pose_publisher -->
 
     <arg name="base_link" default="base_link" />
     <arg name="publish_frequency" default="20" />
 
-    <node name="map_pose_publisher" pkg="robot_pose_publisher" type="robot_pose_publisher">
+    <node name="map_pose_publisher" pkg="uml_hri_nerve_navigation" type="pose_publisher">
         <remap from="robot_pose" to="map_pose" />
-        <param name="map_frame" value="/map" />
+        <param name="map_frame" value="map" />
         <param name="base_frame" value="$(arg base_link)" />
         <param name="publish_frequency" value="$(arg publish_frequency)" />
         <param name="is_stamped" value="true" />
