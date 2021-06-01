@@ -10,7 +10,7 @@
     <remap from="cloud_in" to="$(arg pointcloud_topic)" />
     <param name="base_frame_id" value="$(arg base_link)" />
     <param name="resolution" value="0.05" />
-    <param name="frame_id" type="string" value="/map" />
+    <param name="frame_id" type="string" value="map" />
     <param name="sensor_model/max_range" value="3.0" />
     <param name="filter_ground" value="false" />
       

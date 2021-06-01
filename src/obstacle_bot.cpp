@@ -19,7 +19,7 @@ void goalCallback(uml_hri_nerve_navigation::Goal goal_msg)
   move_base_msgs::MoveBaseGoal goal;
 
   //translate Goal Message to a MoveBaseGoal
-  goal.target_pose.header.frame_id = "/map";
+  goal.target_pose.header.frame_id = "map";
   goal.target_pose.header.stamp = ros::Time::now();
   goal.target_pose.pose.position.x = goal_msg.goal.x;
   goal.target_pose.pose.position.y = goal_msg.goal.y;

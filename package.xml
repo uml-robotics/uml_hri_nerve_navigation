@@ -74,6 +74,8 @@
   <build_depend>pointcloud_to_laserscan</build_depend>
   <build_depend>spatio_temporal_voxel_layer</build_depend>
   <build_depend>teleop_twist_keyboard</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
   <build_export_depend>laser_filters</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
@@ -98,6 +100,8 @@
   <build_export_depend>pointcloud_to_laserscan</build_export_depend>
   <build_export_depend>spatio_temporal_voxel_layer</build_export_depend>
   <build_export_depend>teleop_twist_keyboard</build_export_depend>
+  <build_export_depend>tf2</build_export_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
   <exec_depend>laser_filters</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
@@ -123,6 +127,8 @@
   <exec_depend>pointcloud_to_laserscan</exec_depend>
   <exec_depend>spatio_temporal_voxel_layer</exec_depend>
   <exec_depend>teleop_twist_keyboard</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

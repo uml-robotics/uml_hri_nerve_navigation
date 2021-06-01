@@ -2,9 +2,6 @@
 <launch>
   <!-- This launch file includes all the nodes needed to setup a simulated obstacle_bot for navigation -->
 
-  <!-- Settings (Robot position args are overidden by spawn_world.launch)-->
-  <arg name="level" default="level1" />
-
   <!-- robot determines the topics to be published, and serves as a unique identifier for Gazebo -->
   <arg name="robot" value="obstacle_bot"   />
   <arg name="namespace" value="obstacle_bot"   />
@@ -13,8 +10,8 @@
   <arg name="laser_topic" value="scan" />
   <arg name="cmd_vel_topic" value="cmd_vel" />
   <arg name="odom_topic" value="odom" />
-  <arg name="odom_link" value="$(arg namespace)/odom"/>
-  <arg name="base_link" value="$(arg namespace)/base_footprint" />
+  <arg name="odom_link" value="$(arg namespace)_odom"/>
+  <arg name="base_link" value="$(arg namespace)_base_footprint" />
   
   <!-- Setup nav stack-->
   <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_obstacle_bot.launch">
