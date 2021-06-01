@@ -63,7 +63,8 @@
   <build_depend>fetch_gazebo</build_depend>
   <build_depend>mir_robot</build_depend>
   <build_depend>gmapping</build_depend>
-  <build_depend>hector_slam</build_depend>
+  <build_depend>hector_geotiff</build_depend>
+  <build_depend>hector_trajectory_server</build_depend>
   <build_depend>octomap</build_depend>
   <build_depend>octomap_msgs</build_depend>
   <build_depend>octomap_ros</build_depend>
@@ -86,7 +87,8 @@
   <build_export_depend>fetch_gazebo</build_export_depend>
   <build_export_depend>mir_robot</build_export_depend>
   <build_export_depend>gmapping</build_export_depend>
-  <build_export_depend>hector_slam</build_export_depend>
+  <build_export_depend>hector_geotiff</build_export_depend>
+  <build_export_depend>hector_trajectory_server</build_export_depend>
   <build_export_depend>octomap</build_export_depend>
   <build_export_depend>octomap_msgs</build_export_depend>
   <build_export_depend>octomap_ros</build_export_depend>
@@ -110,7 +112,8 @@
   <exec_depend>fetch_gazebo</exec_depend>
   <exec_depend>mir_robot</exec_depend>
   <exec_depend>gmapping</exec_depend>
-  <exec_depend>hector_slam</exec_depend>
+  <exec_depend>hector_geotiff</exec_depend>
+  <exec_depend>hector_trajectory_server</exec_depend>
   <exec_depend>octomap</exec_depend>
   <exec_depend>octomap_msgs</exec_depend>
   <exec_depend>octomap_ros</exec_depend>
