@@ -6,26 +6,31 @@
   
   ![Example Test Environment](resources/screenshots/test_setup.png) 
 
-## Package Setup:
-1. Clone this repository into your catkin workspace.
+## UML HRI Nerve Navigation Package Suite Setup:
+1. Clone this repository and the Nav Sim Resources repository and into your catkin workspace.
   > cd ~/<your_ws>/src   
-  > git clone https://github.com/uml-robotics/uml_hri_nerve_navigation.git 
-2. Install package dependencies
-  > rosdep update   
-  > rosdep install uml_hri_nerve_navigation
-3. Build your catkin workspace.   
+  > git clone https://github.com/uml-robotics/uml_hri_nerve_navigation.git
+  > git clone https://github.com/uml-robotics/uml_hri_nerve_nav_sim_resources.git
+2. Attempt to build your catkin workspace (will fail building helps with later steps).   
   > cd ..  
   > catkin build   
-4. Source the workspace.  
+3. Source the workspace.  
   > source devel/setup.bash
-5. If simulated tests are going to be performed, the UML HRI Nerve Nav Sim Resources package is also required.  To install, repeat the same commands above but replace the git clone command and the rosdep install command to the following:
-  > git clone https://github.com/uml-robotics/uml_hri_nerve_nav_sim_resources.git  
+4. Install package dependencies
+  > rosdep update   
+  > rosdep install uml_hri_nerve_navigation  
   > rosdep install uml_hri_nerve_nav_sim_resources
-6. Also, If simulated tests are going to be performed, a setup bash script must be ran in the UML HRI Nerve Nav Sim Resources package before running anything
+  If this fails, all of the packages needed are in the package.xml file and use sudo apt install ros-[ROS_VERSION]-[PKG_NAME] to install the necessary packages
+5. Build your catkin workspace.   
+  > cd ..  
+  > catkin build   
+6. Source the workspace.  
+  > source devel/setup.bash
+7. Also, a setup bash script must be ran in the UML HRI Nerve Nav Sim Resources package before running any simulations
   > roscd uml_hri_nerve_nav_sim_resources    
   > . setup.sh
 
-At this point, if all goes well, the package should be ready to run.  
+At this point, if all goes well, all of the uml navigation packages should be ready to run.  
 
 **NOTE BEFORE STARTING:** Sometimes Gazebo can be a bit finicky, and may fail to launch properly for an array of reasons. If something goes wrong, Ctrl+c and try again a few times. If the problem persists there may be an actual issue that needs to be resolved first.
 
@@ -68,11 +73,13 @@ If in simulation and the robot gets stuck or leaves the desired navigation area,
 1. **Creating a Gazebo world in the UML HRI Nerve Nav Sim Resources package if the environment is going to be simulated**  
 For more information on adding a simulated world to the UML HRI Nerve Nav Sim Resources package, refer to the UML HRI Nerve Nav Sim Resources documentation
 2. **Creating a navigation map**    
-Launch the setup_test.launch file specifing the world_path if in simulation and set the navigation argument to false.  By setting the navigation argument to false, the robot will launch all of the necessary nodes to perform navigation mapping.  The robot will automatically generate a map by using the robot's sensor data, but the robot must move throughout the entire environment in order to map the entire environemnt.  To move the robot, follow the terminal instructions to move the robot around using a keyboard.  When mapping, it is recommended to launch RViz to view the current map and ensure that there are not any chuncks missing from the map.
+Launch the map_environment.launch file specifing the world_path if in simulation.  By launching the map_environment launch file, the robot will launch all of the necessary nodes to perform navigation mapping.  The robot will automatically generate a map by using the robot's sensor data, but the robot must move throughout the entire environment in order to map the entire environemnt.  To move the robot, follow the terminal instructions to move the robot around using your keyboard.  When mapping, it is recommended to launch RViz to view the current map and ensure that there are not any chuncks missing from the map.
 3. **Save the maps after mapping the entire environment**    
-Launch the save_maps.launch file specifing the map_name argument as the name for the current environment.
+Launch the save_maps.launch file specifing the map_name argument as the name for the current environment.  Whatever the map_name argument was specified as will become the value of the world_name argument in the level launch file.
 4. **Defining test goals**    
 To define goals for a test inside a given environment, follow the instructions provided under the Defining Test Goals section.
+5. **Creating a level launch file**   
+To create a level launch file, copy one of the premade level launch files in both the navigation and the sim resources package and name the launch files to whatever you saved the map as in Step 3. Then change the values of the world dependent arguments such as world_name, world_path, and spawn locations.  To figure out what each argument does, refer to the Important Launch Files section below in this README as well as the one in the Sim Resources package.
 
 ## Adding a New Robot:
   TODO

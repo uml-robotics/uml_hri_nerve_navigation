@@ -14,7 +14,7 @@
     <arg name="robot" default="pioneer" />
   
     <!-- Define map settings, values are set in the level launch files-->
-    <arg name="world_path" />
+    <arg name="world_path" default=""/>
   
     <!-- Setup the simulation if the environment is in simulation -->
     <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/levels/$(arg world_path).launch" if="$(arg sim)">
