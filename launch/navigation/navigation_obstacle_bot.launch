@@ -69,14 +69,14 @@
   <group if="$(eval not namespace)">
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)">
       <arg name="config" value="$(arg move_base_config)" />
-      <arg name="robot_type" value="$(arg robot)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
 
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)">
       <arg name="config" value="$(arg move_base_config)_unknown" />
-      <arg name="robot_type" value="$(arg robot)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
@@ -85,14 +85,14 @@
   <group unless="$(eval not namespace)">
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)" ns="$(arg namespace)">
       <arg name="config" value="$(arg move_base_config)" />
-      <arg name="robot_type" value="$(arg robot)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
 
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)" ns="$(arg namespace)">
       <arg name="config" value="$(arg move_base_config)_unknown" />
-      <arg name="robot_type" value="$(arg robot)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>

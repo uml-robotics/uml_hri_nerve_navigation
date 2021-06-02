@@ -4,11 +4,11 @@
 
   <!-- Settings -->
   <arg name="namespace" default="" />
-  <arg name="robot_type" default="pioneer" />
+  <arg name="robot" default="pioneer" />
   <!-- Map name -->
   <arg name="map" default="level1" />
   <!-- Move_base configuration folder. -->
-  <arg name="move_base_config" default="2d" />
+  <arg name="move_base_config" value="2d" />
   <!-- NOTE: move_base_config specifies the folder to find the .yaml config files for
        move_base. If you would like to safely play around with navigation settings,
        you can copy the default folder, rename it, then change move_base_config. -->
@@ -75,14 +75,14 @@
   <group if="$(eval not namespace)">
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)">
       <arg name="config" value="$(arg move_base_config)" />
-      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
 
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)">
       <arg name="config" value="$(arg move_base_config)_unknown" />
-      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
@@ -91,14 +91,14 @@
   <group unless="$(eval not namespace)">
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" if="$(arg use_static_map)" ns="$(arg namespace)">
       <arg name="config" value="$(arg move_base_config)" />
-      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>
 
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/move_base.launch" unless="$(arg use_static_map)" ns="$(arg namespace)">
       <arg name="config" value="$(arg move_base_config)_unknown" />
-      <arg name="robot_type" value="$(arg robot_type)" />
+      <arg name="robot" value="$(arg robot)" />
       <arg name="cmd_vel_topic" value="$(arg cmd_vel_topic)" />
       <arg name="odom_topic" value="$(arg odom_topic)" />
     </include>

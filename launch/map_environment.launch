@@ -1,0 +1,37 @@
+<launch>
+    <!-- This launch file is responsible for launching all of the necessesary nodes to be able to map a new environment. -->
+  
+    <!-- Determine whether the robot is physical or simulated-->
+    <arg name="sim" default="true" />
+  
+    <!-- If in sim, enable gazebo gui or not -->
+    <arg name="gui" default="true" />
+  
+    <!-- Use 3d or 2d navigation -->
+    <arg name="3d" default="false" />
+  
+    <!-- Type of robot being spawned in -->
+    <arg name="robot" default="pioneer" />
+  
+    <!-- Define map settings, values are set in the level launch files-->
+    <arg name="world_path" />
+  
+    <!-- Setup the simulation if the environment is in simulation -->
+    <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/levels/$(arg world_path).launch" if="$(arg sim)">
+      <arg name="gui" value="$(arg gui)" />
+      <arg name="robot" value="$(arg robot)" />
+      <arg name="obstacle_bot" value="false" />
+      <arg name="dynamic_obstacle" value="false" />
+      <arg name="obstacle_name" value="" />
+      <arg name="flip_obstacle" value="false" />
+    </include>
+  
+    <!-- Setup robot -->
+    <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
+      <arg name="level" value="" /> <!--not used for mapping -->
+      <arg name="navigate" value="false" />
+      <arg name="3d" value="$(arg 3d)" />
+      <arg name="static_map" value="" /> <!--not used for mapping -->
+    </include>
+  
+  </launch>

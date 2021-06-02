@@ -32,7 +32,7 @@
       <!-- Start 3d Nav Stack if 3d = true -->
       <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_3d.launch" if="$(arg 3d)">
         <arg name="namespace" value="$(arg namespace)" />
-        <arg name="robot_type" value="$(arg robot)" />
+        <arg name="robot" value="$(arg robot)" />
         <arg name="map" value="$(arg level)" />
         <arg name="use_static_map" value="$(arg static_map)" />
         <arg name="has_laser" value="true" />
@@ -47,7 +47,7 @@
       <!-- Start 2d Nav Stack if 3d = false -->
       <include file="$(find uml_hri_nerve_navigation)/launch/navigation/navigation_2d.launch" unless="$(arg 3d)">
         <arg name="namespace" value="$(arg namespace)" />
-        <arg name="robot_type" value="$(arg robot)" />
+        <arg name="robot" value="$(arg robot)" />
         <arg name="map" value="$(arg level)" />
         <arg name="use_static_map" value="$(arg static_map)" />
         <arg name="laser_topic" value="$(arg laser_topic)" />
@@ -62,7 +62,6 @@
     <!-- Start Mapping -->
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/map_teleop.launch">
       <arg name="namespace" value="$(arg namespace)" />
-      <arg name="map" value="$(arg level)" />
       <arg name="3d" value="$(arg 3d)" />
       <arg name="laser_topic" value="$(arg laser_topic)" />
       <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />

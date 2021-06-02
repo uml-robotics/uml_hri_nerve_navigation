@@ -1,7 +1,7 @@
 <launch>
   <!-- Doc: http://wiki.ros.org/move_base?distro=kinetic -->
 
-  <arg name="robot_type" default="pioneer" />
+  <arg name="robot" default="pioneer" />
   <arg name="config" default="3d" />
   
   <arg name="cmd_vel_topic" default="cmd_vel" />
@@ -10,14 +10,14 @@
   <!-- Use global costmap-->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <!-- Include robot specific parameters from the robot config folder -->
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/costmap_height.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/costmap_height.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/base_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_type)/navigation/$(arg config)/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/costmap_height.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/costmap_height.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot)/navigation/$(arg config)/global_planner_params.yaml" command="load" />
 
     <param name="conservative_reset_dist" type="double" value="3.0" />
     <param name="controller_frequency" type="double" value="7.0" /> <!-- 20 -->
