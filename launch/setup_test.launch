@@ -7,11 +7,8 @@
   <!-- If in sim, enable gazebo gui or not -->
   <arg name="gui" default="true" />
 
-  <!-- Launch in either navigate mode or mapping mode -->
-  <arg name="navigate" default="true" />
-
   <!-- Use 3d or 2d navigation -->
-  <arg name="3d" default="true" />
+  <arg name="3d" default="false" />
 
   <!-- Use the static global map while navigating -->
   <arg name="static_map" default="true" />
@@ -76,7 +73,7 @@
   <!-- Setup robot -->
   <include file="$(find uml_hri_nerve_navigation)/launch/robots/setup_$(arg robot).launch">
     <arg name="level" value="$(arg world_name)" />
-    <arg name="navigate" value="$(arg navigate)" />
+    <arg name="navigate" value="true" />
     <arg name="3d" value="$(arg 3d)" />
     <arg name="static_map" value="$(arg static_map)" />
   </include>

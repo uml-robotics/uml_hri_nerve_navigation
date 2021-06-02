@@ -5,17 +5,8 @@
 
     <!-- Settings -->
     <arg name="namespace" default="" />
-    <!-- Map Name-->
-    <arg name="map" default="level1" />
-    <!-- Boolean for whether a 2d map is already present-->
-    <arg name="static_2d_map" default="false" />
     <!-- Boolean for whether 3d mapping is necessary-->
     <arg name="3d" default="true" />
-
-    <!-- Initial orientation for AMCL node. (Should be set to match robot spawn position).  Used only when static 2d maps are used -->
-    <arg name="init_x" default="0.0" />
-    <arg name="init_y" default="0.0" />
-    <arg name="init_yaw" default="0.0" /> <!-- Radians -->
 
     <!-- Robot sensor topic Mapping-->
     <arg name="laser_topic" />
@@ -26,7 +17,6 @@
 
     <!-- Start gmapping-->
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch" if="$(eval not namespace)">
-        <arg name="namespace" value="$(arg namespace)" />
         <arg name="scan_topic" value="$(arg laser_topic)" />
         <arg name="odom_link" value="$(arg odom_link)" />
         <arg name="base_link" value="$(arg base_link)" />
@@ -34,7 +24,6 @@
 
     <!-- Start gmapping with namespace -->
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/gmapper.launch" ns="$(arg namespace)" unless="$(eval not namespace)">
-        <arg name="namespace" value="$(arg namespace)" />
         <arg name="scan_topic" value="$(arg laser_topic)" />
         <arg name="odom_link" value="$(arg odom_link)" />
         <arg name="base_link" value="$(arg base_link)" />
@@ -43,7 +32,6 @@
     <!-- Start octomap_server if 3d mapping also needs to be done-->
     <group if="$(arg 3d)">
         <include file="$(find uml_hri_nerve_navigation)/launch/navigation/octomap_mapper.launch">
-            <arg name="robot" value="$(arg namespace)" />
             <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />
             <arg name="base_link" value="$(arg base_link)" />
         </include>

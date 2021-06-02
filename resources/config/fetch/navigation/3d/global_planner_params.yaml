@@ -8,3 +8,4 @@ GlobalPlanner:
   orientation_window_size: 1
   publish_potential: false
   default_tolerance: 0.2
+  outline_map: false
