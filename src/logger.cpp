@@ -1,3 +1,10 @@
+/*
+    The logger node records all relevent information needed during a navigation test and logs the information into a csv and a txt file.  All of the one-time initial paramters are saved to the text file
+    and all of the parameters that change during the duration of a test are saved in the csv file.  Some examples of the data that is recorded are the robot's position, the current goal location, and the
+    current distance to the goal.  The logs are also sorted out into folders that are named using the current level, robot, and the initial timestamp of the log.  The logs can be found on the resources/logs
+    folder.
+*/
+
 #include <ros/ros.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>

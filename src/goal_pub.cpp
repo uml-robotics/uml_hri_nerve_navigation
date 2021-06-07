@@ -1,7 +1,7 @@
 /*  
-    The goal_pub node publishes the current navigation goal to the goal topic.  In a navigation test, two goals are specified and the
-    robot travels between the two goals for a specifed number of iterations.  The goal_pub keeps track which goal is the current goal
-    and current goal is swapped if the goal_pub service is called.
+    The goal_pub node publishes the current navigation goal to the goal topic.  In a navigation test, a set of navigation goals are specified in a csv file and the
+    robot travels between the specified goals for a specifed number of iterations.  The goal_pub keeps track which goal is the current goal and the next goal is recieved
+    if the goal_pub service is called.  This node also handles parsing the goal csv file.  For more info on the defining goals, check out the README.
 */
 
 #include <ros/ros.h>

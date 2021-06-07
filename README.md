@@ -9,17 +9,18 @@
 ## UML HRI Nerve Navigation Package Suite Setup:
 1. Clone this repository and the Nav Sim Resources repository and into your catkin workspace.
   > cd ~/<your_ws>/src   
-  > git clone https://github.com/uml-robotics/uml_hri_nerve_navigation.git
-  > git clone https://github.com/uml-robotics/uml_hri_nerve_nav_sim_resources.git
+  > git clone https://github.com/uml-robotics/uml_hri_nerve_navigation.git    
+  > git clone https://github.com/uml-robotics/uml_hri_nerve_nav_sim_resources.git   
 2. Attempt to build your catkin workspace (will fail building helps with later steps).   
   > cd ..  
   > catkin build   
 3. Source the workspace.  
-  > source devel/setup.bash
-4. Install package dependencies
+  > source devel/setup.bash   
+4. Install package dependencies   
   > rosdep update   
   > rosdep install uml_hri_nerve_navigation  
-  > rosdep install uml_hri_nerve_nav_sim_resources
+  > rosdep install uml_hri_nerve_nav_sim_resources   
+
   If this fails, all of the packages needed are in the package.xml file and use sudo apt install ros-[ROS_VERSION]-[PKG_NAME] to install the necessary packages
 5. Build your catkin workspace.   
   > cd ..  
@@ -28,11 +29,13 @@
   > source devel/setup.bash
 7. Also, a setup bash script must be ran in the UML HRI Nerve Nav Sim Resources package before running any simulations
   > roscd uml_hri_nerve_nav_sim_resources    
-  > . setup.sh
+  > . setup.sh [# for gazebo version (7 if kinetic and 9 if melodic)]
 
 At this point, if all goes well, all of the uml navigation packages should be ready to run.  
 
-**NOTE BEFORE STARTING:** Sometimes Gazebo can be a bit finicky, and may fail to launch properly for an array of reasons. If something goes wrong, Ctrl+c and try again a few times. If the problem persists there may be an actual issue that needs to be resolved first.
+**NOTE BEFORE STARTING:** Sometimes Gazebo can be a bit finicky, and may fail to launch properly for an array of reasons. If something goes wrong, Ctrl+c and try again a few times. If the problem persists there may be an actual issue that needs to be resolved first.    
+**NOTE BEFORE STARTING:** If Melodic is being used, there are issues with the fetch simulation package and the robot will not operate properly in simulation.  Also, Melodic has an issue with processing the 2d argument in the higher level launch files and the value should be manually changed.
+
 
 ## Running a Test:   
 There are two main ways to run a test:
@@ -79,7 +82,7 @@ Launch the save_maps.launch file specifing the map_name argument as the name for
 4. **Defining test goals**    
 To define goals for a test inside a given environment, follow the instructions provided under the Defining Test Goals section.
 5. **Creating a level launch file**   
-To create a level launch file, copy one of the premade level launch files in both the navigation and the sim resources package and name the launch files to whatever you saved the map as in Step 3. Then change the values of the world dependent arguments such as world_name, world_path, and spawn locations.  To figure out what each argument does, refer to the Important Launch Files section below in this README as well as the one in the Sim Resources package.
+To create a level launch file, copy one of the premade level launch files in both the navigation and name the launch files to whatever you saved the map as in Step 3. Then change the values of the world dependent arguments such as world_name, world_path, and spawn locations.  To figure out what each argument does, refer to the Important Launch Files section below in this README.
 
 ## Adding a New Robot:
   TODO
