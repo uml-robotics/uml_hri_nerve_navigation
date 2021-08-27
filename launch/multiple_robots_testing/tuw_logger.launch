@@ -1,0 +1,8 @@
+<launch>
+    <arg name="robot" default="pioneer"/>
+    <!-- <arg name="robot2" default="pioneer_bot"/> -->
+
+    <node name="$(arg robot)_tuw_node" type="tuw_node" pkg="uml_hri_nerve_navigation" output="screen">
+        <param name="robot_name" value="$(arg robot)"/>
+    </node>    
+</launch>

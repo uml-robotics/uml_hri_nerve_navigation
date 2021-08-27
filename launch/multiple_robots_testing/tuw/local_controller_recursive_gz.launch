@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="nr_of_robots" default="2"/>
+  <arg name="robot_name" default="pioneer"/>
+  <arg name="mbf" default="true" />
+  <!-- reduce the loop counter "nr_of_robots-1" = robot_id -->
+  <arg name="robot_id" value="$(eval arg('nr_of_robots') - 1)"/>
+
+  <!-- launch the controller -->
+
+  <group if="$(arg mbf)">
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/mbf_local_controller.launch">
+      <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
+  </group>
+
+  <group unless="$(arg mbf)">
+    <include file="$(find tuw_multi_robot_demo)/launch/local_controller.launch">
+      <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
+  </group>
+
+  <!-- recursive call -->
+  <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/local_controller_recursive_gz.launch" if="$(eval arg('robot_id') > 0)">
+      <arg name="nr_of_robots" value="$(arg robot_id)" />
+      <arg name="robot_name" value="pioneer_bot" />
+      <arg name="mbf" value="$(arg mbf)"/>
+  </include>
+
+</launch>

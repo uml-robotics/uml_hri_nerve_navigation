@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="world_name" default="nerve2"/>
+    <arg name="level" default="nerve2_base_world"/>
+
+    <arg name="robot1_x" default="6.0"/>
+    <arg name="robot1_y" default="1.0"/>
+    <arg name="robot2_x" default="3.0"/>
+    <arg name="robot2_y" default="4.0"/>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
+        <arg name="launch_robot" value="true"/>
+        <arg name="world_path" value="$(arg world_name)"/>
+        <arg name="level" value="$(arg level)"/>
+        <arg name="x" value="$(arg robot1_x)"/>
+        <arg name="y" value="$(arg robot1_y)"/>
+        <arg name="mbf" value="false"/>
+        <arg name="move_base" value="false"/>
+        <arg name="tuw" value="true"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+        <arg name="robot_name" value="pioneer_bot"/>
+        <arg name="level" value="$(arg level)"/>
+        <arg name="x" value="$(arg robot2_x)"/>
+        <arg name="y" value="$(arg robot2_y)"/>
+        <arg name="mbf" value="false"/>
+        <arg name="move_base" value="false"/>
+        <arg name="tuw" value="true"/>
+    </include>
+        
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/tuw.launch">
+        <arg name="mbf" value="false"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_logger.launch">
+        <arg name="robot" value="pioneer"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_logger.launch">
+        <arg name="robot" value="pioneer_bot"/>
+    </include>
+
+
+    <node name="checker_node" type="checker_node" pkg="uml_hri_nerve_navigation" output="screen" required="true">
+        <param name="robot1_name" value="pioneer"/>
+        <param name="robot2_name" value="pioneer_bot"/>
+    </node>
+
+    
+</launch>

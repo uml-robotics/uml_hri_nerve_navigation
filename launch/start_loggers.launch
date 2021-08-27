@@ -2,20 +2,60 @@
     <!-- Save the path for the logs using the current time -->
     <arg name="robot" />
     <arg name="level" />
-    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_$(arg robot)_%(%d_%m_%Y_%I_%M_%S)T&quot;'" />
+    <!-- <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg robot)_$(arg level)_%(%d_%m_%Y_%I_%M_%S)T&quot;'" /> -->
+    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_%(%m_%d_%Y)T/%(%I_%M_%S)T_$(arg robot)&quot;'" />
+    
+    <arg name="mbf" default="false"/>
+    <arg name="move_base" default="true"/>
+    <arg name="tuw" default="false"/>
 
-    <!-- Start the csv logger-->
-    <node name="logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
-        <remap from="odom" to="base_pose_ground_truth" />
-        <remap from="~file_path" to="log_file_path" />
-    </node>
+    <!--Start the csv logger-->
+    <group if="$(arg mbf)">
+        <node name="$(arg robot)_logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
+            <param name="mbf" value="$(arg mbf)"/>
+            <param name="tuw" value="$(arg tuw)"/>
+            <remap from="odom" to="$(arg robot)/base_pose_ground_truth" />
+            <remap from="~file_path" to="log_file_path" />
+            <remap from="map_pose" to="/$(arg robot)/map_pose"/>
+            <remap from="bumper_contact" to="/$(arg robot)/bumper_contact"/>
+            <remap from="goal" to="/$(arg robot)/goal"/>
+            <remap from="test_status" to="/$(arg robot)/test_status"/>
+            <remap from="result" to="/$(arg robot)/result"/>
+        </node>
+    </group>
+    <group if="$(arg tuw)">
+        <node name="$(arg robot)_logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
+            <param name="mbf" value="$(arg mbf)"/>
+            <param name="tuw" value="$(arg tuw)"/>
+            <remap from="odom" to="$(arg robot)/base_pose_ground_truth" />
+            <remap from="~file_path" to="log_file_path" />
+            <remap from="map_pose" to="/$(arg robot)/map_pose"/>
+            <remap from="bumper_contact" to="/$(arg robot)/bumper_contact"/>
+            <remap from="goal" to="/$(arg robot)/goal"/>
+            <remap from="test_status" to="/$(arg robot)/test_status"/>
+            <remap from="result" to="/$(arg robot)/execute_path/result"/>
+        </node>
+    </group>
+    <group if="$(arg move_base)">
+        <node name="$(arg robot)_logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
+            <param name="mbf" value="$(arg mbf)"/>
+            <param name="tuw" value="$(arg tuw)"/>
+            <remap from="odom" to="$(arg robot)/base_pose_ground_truth" />
+            <remap from="~file_path" to="log_file_path" />
+            <remap from="map_pose" to="/$(arg robot)/map_pose"/>
+            <remap from="bumper_contact" to="/$(arg robot)/bumper_contact"/>
+            <remap from="goal" to="/$(arg robot)/goal"/>
+            <remap from="test_status" to="/$(arg robot)/test_status"/>
+            <remap from="result" to="/$(arg robot)_move_base/result"/>
+        </node>
+    </group>
 
     <!-- Docs: https://wiki.ros.org/hector_geotiff -->
     <!-- Start the geotiff map writer -->
     <arg name="map_name" default="traj_map" />
     <arg name="map_update_interval" default="10.0" />
 
-    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="hector_trajectory_server" output="screen">
+    <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="$(arg robot)_hector_trajectory_server" output="screen">
         <param name="target_frame_name" type="string" value="/map" />
         <remap from="map" to="/static_map" />
         <param name="source_frame_name" type="string" value="base_link" />
@@ -23,7 +63,7 @@
         <param name="trajectory_publish_rate" type="double" value="0.25" />
     </node>
 
-    <node pkg="hector_geotiff" type="geotiff_node" name="hector_geotiff_node" output="screen" launch-prefix="nice -n 15">
+    <node pkg="hector_geotiff" type="geotiff_node" name="$(arg robot)_hector_geotiff_node" output="screen" launch-prefix="nice -n 15">
         <remap from="map" to="/static_map" />
         <remap from="~map_file_path" to="log_file_path" />
         <param name="map_file_base_name" type="string" value="$(arg map_name)" />
@@ -32,5 +72,6 @@
         <param name="geotiff_save_period" type="double" value="$(arg map_update_interval)" />
         <param name="plugins" type="string" value="hector_geotiff_plugins/TrajectoryMapWriter" />
     </node>
-    
+
+
 </launch>

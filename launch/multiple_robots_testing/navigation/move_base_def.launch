@@ -1,0 +1,25 @@
+<launch>
+  <!-- Doc: http://wiki.ros.org/move_base?distro=kinetic -->
+
+  <arg name="namespace" default="pioneer" />
+  <arg name="config" default="default_$(arg namespace)" />
+
+  <node pkg="move_base" type="move_base" respawn="false" name="$(arg namespace)_move_base" output="screen">
+    <!-- Remap topic to recieve movement commands -->
+    <remap from="cmd_vel" to="$(arg namespace)/cmd_vel"/>
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg config)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg config)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg config)/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg config)/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg config)/base_local_planner_params.yaml" command="load" />
+    <param name="conservative_reset_dist" type="double" value="3.0" />
+    <param name="controller_frequency" type="double" value="15.0" />
+
+    <remap from="/move_base/goal" to="/$(arg namespace)_move_base/goal"/>
+    <remap from="/move_base/cancel" to="/$(arg namespace)_move_base/cancel"/>
+    <remap from="/move_base/feedback" to="/$(arg namespace)_move_base/feedback"/>
+    <remap from="/move_base/result" to="/$(arg namespace)_move_base/result"/>
+    <remap from="/move_base/status" to="/$(arg namespace)_move_base/status"/>
+
+  </node>
+</launch>

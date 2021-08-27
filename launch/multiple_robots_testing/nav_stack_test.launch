@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="world_name" default="nerve2"/>
+    <arg name="level" default="nerve2_base_world"/>
+
+    <arg name="robot1_x" default="6.0"/>
+    <arg name="robot1_y" default="1.0"/>
+    <arg name="robot2_x" default="3.0"/>
+    <arg name="robot2_y" default="4.0"/>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
+        <arg name="launch_robot" value="true"/>
+        <arg name="world_path" value="$(arg world_name)"/>
+        <arg name="mbf" value="false"/>
+        <arg name="move_base" value="true"/>
+        <arg name="tuw" value="false"/>
+        <arg name="level" value="$(arg level)"/>
+        <arg name="x" value="$(arg robot1_x)"/>
+        <arg name="y" value="$(arg robot1_y)"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+        <arg name="robot_name" value="pioneer_bot"/>
+        <arg name="level" value="$(arg level)"/>
+        <arg name="mbf" value="false"/>
+        <arg name="move_base" value="true"/>
+        <arg name="tuw" value="false"/>
+        <arg name="x" value="$(arg robot2_x)"/>
+        <arg name="y" value="$(arg robot2_y)"/>
+    </include>
+
+    <!-- start rviz -->
+    <include file="$(find tuw_multi_robot_demo)/launch/rviz.launch">
+        <arg name="cfg" value="mb"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/move_base_checker.launch">
+        <arg name="robot1_name" value="pioneer"/>
+        <arg name="robot2_name" value="pioneer_bot"/>
+    </include>   
+
+</launch>

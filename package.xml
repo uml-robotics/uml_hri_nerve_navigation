@@ -76,6 +76,9 @@
   <build_depend>teleop_twist_keyboard</build_depend>
   <build_depend>tf2</build_depend>
   <build_depend>tf2_ros</build_depend>
+
+  <build_depend>tuw_local_controller_msgs</build_depend>
+
   <build_export_depend>laser_filters</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
@@ -102,6 +105,10 @@
   <build_export_depend>teleop_twist_keyboard</build_export_depend>
   <build_export_depend>tf2</build_export_depend>
   <build_export_depend>tf2_ros</build_export_depend>
+
+  <build_export_depend>tuw_local_controller_msgs</build_export_depend>
+  <exec_depend>tuw_local_controller_msgs</exec_depend>
+
   <exec_depend>laser_filters</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>

@@ -24,8 +24,8 @@
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <boost/filesystem.hpp>
-
-
+#include <mbf_msgs/ExePathActionResult.h>
+#include <tuw_local_controller_msgs/ExecutePathActionResult.h>
 //SimLog is a custom message type defined in uml_hri_nerve_navigation/msg/SimLog.msg
 #include <uml_hri_nerve_navigation/SimLog.h>
 
@@ -84,7 +84,7 @@ public:
 
         log.iteration = 0;
 
-        //Get file path from parameter
+        //Get fcsvile path from parameter
         std::string file_path;
         n.getParam(ros::this_node::getName()+"/file_path", file_path);
         std::string file_path_csv = file_path + "/sim_log.csv";
@@ -208,6 +208,34 @@ public:
         }
     }
 
+    void mbf_add_goal(geometry_msgs::Pose2D goal_pose){
+        if (!navigating && test_active)
+        {
+            //Save goal pos
+            log.goal.x =  goal_pose.x;
+            log.goal.y =  goal_pose.y;
+
+            //Change nav and publish state
+            navigating = true;
+            publishing = true;
+
+            //Increment iterations
+            log.iteration++;
+
+            //Reset iteration collision counter
+            iteration_collision = 0;
+            
+            int num = log.iteration;
+
+            //Add msg log
+            std::stringstream str;
+            str << "Goal: " << num << " registered at x:" << goal_pose.x << " y:" << goal_pose.y;
+            log.event = str.str();
+            ROS_INFO("Starting iteration %d", log.iteration);
+            ROS_INFO("Goal: %d registered at x:%.3f y:%.3f", num, goal_pose.x, goal_pose.y);
+        }
+    }
+
     void set_test_status(std_msgs::Bool test_status_msg)
     {
         test_active = test_status_msg.data;
@@ -223,7 +251,7 @@ public:
             //Calculate the distance from the current pos to the goal.  This line is here instead of add_position because the goal can change, 
             //but the position doesn't and the distance calculation won't be performed until the position changes
             log.dist_from_goal = distance(log.goal.x, log.goal.y, log.robot_pos.x, log.robot_pos.y);
-
+            
             //Write the contents of the log msg to the csv file (replace with publisher .publish if you want to publish a sim_log topic)
             csvFile << std::to_string(log.header.stamp.toNSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
                     log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
@@ -299,7 +327,32 @@ void goal_callback(const uml_hri_nerve_navigation::Goal::ConstPtr &goal)
     logger->add_goal(*goal);
 }
 
+void mbf_goal_callback(const geometry_msgs::Pose2D::ConstPtr &goal)
+{
+    logger->mbf_add_goal(*goal);
+}
+
 void state_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr &state)
+{
+    if (state->status.status == state->status.ABORTED || state->status.status == state->status.REJECTED)
+    {
+        logger->add_nav_result(false);
+    }
+
+    if (state->status.status == state->status.SUCCEEDED)
+    {
+        logger->add_nav_result(true);
+    }
+    
+}
+
+void mbf_state_callback(const std_msgs::Bool::ConstPtr &state)
+{
+    logger->add_nav_result(state->data);    
+}
+
+// tuw_local_controller_msgs/ExecutePathActionResult
+void tuw_state_callback(const tuw_local_controller_msgs::ExecutePathActionResult::ConstPtr &state)
 {
     if (state->status.status == state->status.ABORTED || state->status.status == state->status.REJECTED)
     {
@@ -327,12 +380,28 @@ int main(int argc, char **argv)
     ros::Rate rate(20);
     ros::AsyncSpinner spinner(5);
 
-    // Setup subscribers
+    bool mbf = false;
+    bool tuw = false;
+    n.getParam(ros::this_node::getName()+"/mbf", mbf);
+    n.getParam(ros::this_node::getName()+"/tuw", tuw);
+    
     ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
-    ros::Subscriber goal_sub = n.subscribe("goal", 10, goal_callback);
-    ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);
-    ros::Subscriber test_status = n.subscribe("/test_status", 10, test_status_callback);
+    ros::Subscriber test_status = n.subscribe("test_status", 10, test_status_callback);
+    ros::Subscriber goal_sub = n.subscribe("goal", 10, mbf_goal_callback);;
+    ros::Subscriber move_base_result;
+
+    if (mbf) {
+        move_base_result = n.subscribe("result", 10, mbf_state_callback);
+    }
+    else if (tuw){
+        move_base_result = n.subscribe("result", 10, tuw_state_callback);
+    }
+    else {
+        ROS_ERROR("MBF FALSE");
+        move_base_result = n.subscribe("result", 10, state_callback);
+    }
+    
 
     logger = new Logger(n);
 

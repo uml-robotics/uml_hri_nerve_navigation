@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="num_tests" default="2"/>
+
+  <arg name="robot_id" value="$(eval arg('num_tests') - 1)"/>
+
+  <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_test.launch" if="$(eval arg('robot_id') > 0)" />  
+
+</launch>

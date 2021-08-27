@@ -21,10 +21,16 @@
 
   <!-- Laser filter to remove infinite values from the front facing laser -->
   <!-- http://wiki.ros.org/laser_filters -->
-  <node name="laser_filter" pkg="laser_filters" type="scan_to_scan_filter_chain">
+  <!-- <node name="laser_filter" pkg="laser_filters" type="scan_to_scan_filter_chain">
     <rosparam command="load" file="$(find uml_hri_nerve_navigation)/resources/config/pioneer/laserfilter_config.yaml" />
-    <remap from="scan" to="frontscan" />
+    <remap from="scan" to="pioneer/frontscan" />
     <remap from="scan_filtered" to="frontscan_filtered" />
+  </node> -->
+
+  <node name="pioneer_laser_filter" pkg="laser_filters" type="scan_to_scan_filter_chain">
+    <rosparam command="load" file="$(find uml_hri_nerve_navigation)/resources/config/pioneer/laserfilter_config.yaml" />
+    <remap from="/scan" to="/$(arg robot)/frontscan" />
+    <remap from="/scan_filtered" to="/$(arg robot)/frontscan_filtered" />
   </node>
 
   <!-- Start Kinect to Laser Converter -->

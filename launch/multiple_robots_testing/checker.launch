@@ -1,0 +1,10 @@
+<launch>
+    <arg name="robot1_name" default="pioneer"/>
+    <arg name="robot2_name" default="pioneer_bot"/>
+
+    <node name="checker_node" type="checker_node" pkg="uml_hri_nerve_navigation" output="screen">
+        <param name="robot1_name" value="$(arg robot1_name)"/>
+        <param name="robot2_name" value="$(arg robot2_name)"/>
+    </node>
+
+</launch>
