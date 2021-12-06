@@ -3,9 +3,10 @@
     <arg name="y" default="18.0"/>
     <arg name="robot_name" default="pioneer"/>
     <arg name="level" default="nerve2_base_world"/>
-    <arg name="mbf" default="true"/>
+    <arg name="mbf" default="false"/>
     <arg name="move_base" default="false"/>
-    <arg name="tuw" default="false"/>
+    <arg name="tuw" default="true"/>
+    <arg name="iteration" default="1"/>
 
     <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/robots/spawn_pioneer.launch">
         <arg name="x" value="$(arg x)" />
@@ -35,7 +36,7 @@
         <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
             <arg name="robot" value="$(arg robot_name)"/>
             <arg name="level" value="$(arg level)"/>
-
+            <arg name="iteration_number" value="$(arg iteration)"/>
             <arg name="mbf" value="true"/>
             <arg name="tuw" value="false"/>
             <arg name="move_base" value="false"/>
@@ -47,6 +48,7 @@
         <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
             <arg name="robot" value="$(arg robot_name)"/>
             <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
 
             <arg name="mbf" value="false"/>
             <arg name="tuw" value="true"/>
@@ -69,6 +71,7 @@
         <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
             <arg name="robot" value="$(arg robot_name)"/>
             <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
 
             <arg name="mbf" value="false"/>
             <arg name="tuw" value="false"/>

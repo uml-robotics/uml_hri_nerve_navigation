@@ -1,0 +1,4 @@
+<launch>
+        <node name="robot_checker_node" type="robot_checker_node" pkg="uml_hri_nerve_navigation" output="screen">
+        </node>
+</launch>

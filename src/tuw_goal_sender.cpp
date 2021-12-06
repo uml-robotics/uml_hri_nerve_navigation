@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <tuw_multi_robot_msgs/RobotGoalsArray.h>
 #include <tuw_multi_robot_msgs/RobotGoals.h>
+#include <geometry_msgs/PoseStamped.h>
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "tuw_goal_sender_node");

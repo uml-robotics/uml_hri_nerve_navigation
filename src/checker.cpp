@@ -145,7 +145,7 @@ int main(int argc, char** argv){
     ros::Rate rate(1);
     while(ros::ok()){
         // checks if both robots have reached their goals then prepare for shutting down the node
-        if (robot1_goal_reached && robot2_goal_reached){
+        if (robot2_goal_reached){
             ROS_INFO("Both robots has reached their goals, shutting down the node....");
             if (robot1_poses.size() != 0){
                 robot1_poses.clear();

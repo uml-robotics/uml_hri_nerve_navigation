@@ -8,6 +8,7 @@
     <arg name="mbf" default="true"/>
     <arg name="move_base" default="false"/>
     <arg name="tuw" default="false"/>
+    <arg name="iteration" default="1"/>
 
     <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/spawn_world.launch">
         <arg name="world_path" value="$(arg world_path)/$(arg level).world"/>
@@ -26,6 +27,8 @@
             <arg name="mbf" value="$(arg mbf)"/>
             <arg name="move_base" value="$(arg move_base)"/>
             <arg name="tuw" value="$(arg tuw)"/>
+            <arg name="iteration" default="$(arg iteration)"/>
+
         </include>
     </group>
  

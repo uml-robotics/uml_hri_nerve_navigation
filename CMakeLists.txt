@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib
   gazebo_msgs
   tuw_local_controller_msgs
+  tuw_multi_robot_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -126,6 +127,7 @@ catkin_package(
     actionlib 
     gazebo_msgs
     tuw_local_controller_msgs
+    tuw_multi_robot_msgs
 #  DEPENDS system_lib
 )
 
@@ -183,7 +185,6 @@ add_dependencies(pose_publisher ${pose_publisher_EXPORTED_TARGETS} ${catkin_EXPO
 
 add_dependencies(ob_mover ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
 #### FILES FOR MULTIPLE ROBOT NAVIGATION ####
 
 add_executable(mbf_mover_node src/mbf_mover.cpp)
@@ -192,6 +193,15 @@ add_executable(checker_node src/checker.cpp)
 add_executable(move_base_checker_node src/move_base_checker.cpp)
 add_executable(tuw_node src/tuw_node.cpp)
 add_executable(tuw_goal_sender_node src/tuw_goal_sender.cpp)
+add_executable(test_runner_node src/test_runner.cpp)
+add_executable(graph_checker src/graph_checker.cpp)
+add_executable(robot_checker_node src/robot_checker.cpp)
+
+add_executable(tester_goal_pub_node src/tester_goal_publisher.cpp)
+
+target_link_libraries(tester_goal_pub_node
+        ${catkin_LIBRARIES}
+        )
 
 target_link_libraries(mbf_mover_node
   ${catkin_LIBRARIES}
@@ -213,7 +223,15 @@ target_link_libraries(tuw_node
 target_link_libraries(tuw_goal_sender_node
   ${catkin_LIBRARIES}
 )
-
+target_link_libraries(test_runner_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(graph_checker
+        ${catkin_LIBRARIES}
+        )
+target_link_libraries(robot_checker_node
+        ${catkin_LIBRARIES}
+        )
 #### FILES FOR MOVE BASE FLEX ####
 
 

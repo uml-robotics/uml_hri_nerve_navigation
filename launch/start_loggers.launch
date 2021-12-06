@@ -3,11 +3,14 @@
     <arg name="robot" />
     <arg name="level" />
     <!-- <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg robot)_$(arg level)_%(%d_%m_%Y_%I_%M_%S)T&quot;'" /> -->
-    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_%(%m_%d_%Y)T/%(%I_%M_%S)T_$(arg robot)&quot;'" />
+    <!-- <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_%(%m_%d_%Y)T/%(%I_%M_%S)T_$(arg robot)&quot;'" /> -->
+    <param name="log_file_path" command="bash -c 'printf &quot;$(find uml_hri_nerve_navigation)/resources/logs/$(arg level)_$(arg robot)&quot;'" />
     
     <arg name="mbf" default="false"/>
     <arg name="move_base" default="true"/>
     <arg name="tuw" default="false"/>
+
+    <arg name="iteration_number" default="1"/>
 
     <!--Start the csv logger-->
     <group if="$(arg mbf)">
@@ -21,12 +24,16 @@
             <remap from="goal" to="/$(arg robot)/goal"/>
             <remap from="test_status" to="/$(arg robot)/test_status"/>
             <remap from="result" to="/$(arg robot)/result"/>
+            <remap from="cmd_vel" to="/$(arg robot)/cmd_vel"/>
         </node>
     </group>
     <group if="$(arg tuw)">
         <node name="$(arg robot)_logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
             <param name="mbf" value="$(arg mbf)"/>
             <param name="tuw" value="$(arg tuw)"/>
+
+            <param name="iteration_number" value="$(arg iteration_number)"/>
+
             <remap from="odom" to="$(arg robot)/base_pose_ground_truth" />
             <remap from="~file_path" to="log_file_path" />
             <remap from="map_pose" to="/$(arg robot)/map_pose"/>
@@ -34,12 +41,17 @@
             <remap from="goal" to="/$(arg robot)/goal"/>
             <remap from="test_status" to="/$(arg robot)/test_status"/>
             <remap from="result" to="/$(arg robot)/execute_path/result"/>
+            <remap from="cmd_vel" to="/$(arg robot)/cmd_vel"/>
+
         </node>
     </group>
     <group if="$(arg move_base)">
         <node name="$(arg robot)_logger" type="logger" pkg="uml_hri_nerve_navigation" output="screen">
             <param name="mbf" value="$(arg mbf)"/>
             <param name="tuw" value="$(arg tuw)"/>
+
+            <param name="iteration_number" value="$(arg iteration_number)"/>
+
             <remap from="odom" to="$(arg robot)/base_pose_ground_truth" />
             <remap from="~file_path" to="log_file_path" />
             <remap from="map_pose" to="/$(arg robot)/map_pose"/>
@@ -47,6 +59,8 @@
             <remap from="goal" to="/$(arg robot)/goal"/>
             <remap from="test_status" to="/$(arg robot)/test_status"/>
             <remap from="result" to="/$(arg robot)_move_base/result"/>
+            <remap from="cmd_vel" to="/$(arg robot)/cmd_vel"/>
+
         </node>
     </group>
 

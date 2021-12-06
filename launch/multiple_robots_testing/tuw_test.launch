@@ -4,10 +4,10 @@
     <arg name="world_name" default="nerve2"/>
     <arg name="level" default="nerve2_base_world"/>
 
-    <arg name="robot1_x" default="6.0"/>
-    <arg name="robot1_y" default="1.0"/>
-    <arg name="robot2_x" default="3.0"/>
-    <arg name="robot2_y" default="4.0"/>
+    <arg name="robot1_x" default="0.0"/>
+    <arg name="robot1_y" default="0.0"/>
+    <arg name="robot2_x" default="0.0"/>
+    <arg name="robot2_y" default="8.0"/>
 
     <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
         <arg name="launch_robot" value="true"/>
@@ -42,11 +42,23 @@
         <arg name="robot" value="pioneer_bot"/>
     </include>
 
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
+        <arg name="robot_name" value="pioneer"/>
+        <arg name="goal_x" value="6.0"/>
+        <arg name="goal_y" value="0.0"/>
+    </include>
 
-    <node name="checker_node" type="checker_node" pkg="uml_hri_nerve_navigation" output="screen" required="true">
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
+        <arg name="robot_name" value="pioneer_bot"/>
+        <arg name="goal_x" value="6.0"/>
+        <arg name="goal_y" value="8.0"/>
+    </include>
+
+
+    <!-- <node name="checker_node" type="checker_node" pkg="uml_hri_nerve_navigation" output="screen" required="true">
         <param name="robot1_name" value="pioneer"/>
         <param name="robot2_name" value="pioneer_bot"/>
-    </node>
+    </node> -->
 
     
 </launch>

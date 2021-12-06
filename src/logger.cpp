@@ -11,6 +11,7 @@
 #include <uml_hri_nerve_navigation/Goal.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <gazebo_msgs/ContactsState.h>
 #include <std_msgs/String.h>
@@ -62,6 +63,10 @@ private:
     //Files
     std::fstream csvFile;
     std::fstream txtFile;
+    std::fstream oStream;
+
+    std::string filePathString;
+    std::string filePathVel;
 
 public:
     Logger(ros::NodeHandle n)
@@ -87,21 +92,69 @@ public:
         //Get fcsvile path from parameter
         std::string file_path;
         n.getParam(ros::this_node::getName()+"/file_path", file_path);
+        filePathString = file_path;
+        filePathVel = file_path + "/velocity.txt";
         std::string file_path_csv = file_path + "/sim_log.csv";
         std::string file_path_txt = file_path + "/config.txt";
+        std::string file_path_print = file_path + "/print.txt";
+
 
         //Create the folders
-        boost::filesystem::create_directories(file_path.c_str());
-        boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
+        //boost::filesystem::create_directories(file_path.c_str());
+        //boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
 
         //Create files
-        csvFile.open(file_path_csv.c_str(), std::ios::out);
+        csvFile.open(file_path_csv.c_str(), std::ios::out | std::ios_base::app);
         txtFile.open(file_path_txt.c_str(), std::ios::out);
+        // oStream.open(file_path_print.c_str(), std::ios::out);
 
-        //Write the headers for the csv file
+        std::string file_path_iteration = file_path + "/num_iteration.txt";
+        std::ifstream inStream;
+        std::fstream outStream;
+        int num;
+
+        if (!csvFile){
+            int temp = 0;
+            boost::filesystem::create_directories(file_path.c_str());
+            boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
+            csvFile.open(file_path_csv.c_str(), std::ios::out);
+            txtFile.open(file_path_txt.c_str(), std::ios::out);
+            // oStream.open(file_path_print.c_str(), std::ios::out);
+
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << temp;
+            outStream.close();
+        }
+
+        inStream.open(file_path_iteration.c_str());
+        inStream >> num;
+        inStream.close();
+
+        num++;
+        outStream.open(file_path_iteration.c_str(), std::ios::out);
+        outStream << num;
+        outStream.close();
+
+        oStream.open(file_path_print.c_str(), std::ios::out);
+        oStream << "Position: (0.00, 0.00) | Distance from goal: 0.00" << std::endl; 
+        oStream.close();        
+
+        csvFile << "Iteration " << num << std::endl;
+
         csvFile<<"Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Iteration,Event" << std::endl;
     };
 
+    void add_velocity(geometry_msgs::Twist cmd_vel){
+        std::fstream velFile;
+        velFile.setf(std::ios::fixed);
+        velFile.setf(std::ios::showpoint);
+        velFile.precision(2);
+        if (navigating && test_active) {
+            velFile.open(filePathVel.c_str(), std::ios::out);
+            velFile << "Velocity: Linear: " << cmd_vel.linear.x << " | Angular: " << cmd_vel.angular.z << std::endl;
+            velFile.close();
+        }
+    }
     void add_position(geometry_msgs::PoseStamped pose)
     {
         if (navigating && test_active)
@@ -256,7 +309,17 @@ public:
             csvFile << std::to_string(log.header.stamp.toNSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
                     log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
                     std::to_string(log.iteration) << "," << log.event << std::endl;
+            
 
+            std::string file_path_print = filePathString + "/print.txt";
+            oStream.open(file_path_print.c_str(), std::ios::out);
+            oStream.setf(std::ios::fixed);
+            oStream.setf(std::ios::showpoint);
+            oStream.precision(2);
+            oStream << "Position: (" << log.robot_pos.x << ", " << log.robot_pos.y << ") | Distance from goal: " << log.dist_from_goal << std::endl; 
+            oStream.close();
+
+            
             //Reset collision coords if a collision was published
             if (log.collision.x != -100000 || log.collision.y != -100000)
             {
@@ -307,6 +370,7 @@ public:
         //Closes the two files that are being written to at the end of the node's life
         csvFile.close();
         txtFile.close();
+        oStream.close();
     }
 };
 
@@ -315,6 +379,10 @@ Logger *logger;
 void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose)
 {
     logger->add_position(*pose);
+}
+void velocity_callback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
+{
+    logger->add_velocity(*cmd_vel);
 }
 
 void collision_callback(const gazebo_msgs::ContactsState::ConstPtr &collision)
@@ -379,16 +447,20 @@ int main(int argc, char **argv)
 
     ros::Rate rate(20);
     ros::AsyncSpinner spinner(5);
-
+    int place_holder;
     bool mbf = false;
     bool tuw = false;
     n.getParam(ros::this_node::getName()+"/mbf", mbf);
     n.getParam(ros::this_node::getName()+"/tuw", tuw);
-    
+
+    n.getParam(ros::this_node::getName()+"/iteration_number", place_holder);
+
+
     ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
     ros::Subscriber test_status = n.subscribe("test_status", 10, test_status_callback);
-    ros::Subscriber goal_sub = n.subscribe("goal", 10, mbf_goal_callback);;
+    ros::Subscriber goal_sub = n.subscribe("goal", 10, mbf_goal_callback);
+    // ros::Subscriber vel_sub = n.subscribe("cmd_vel", 10, velocity_callback);
     ros::Subscriber move_base_result;
 
     if (mbf) {

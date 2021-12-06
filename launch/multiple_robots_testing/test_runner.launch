@@ -1,0 +1,3 @@
+<launch>
+    <node name="test_runner_node" type="test_runner_node" pkg="uml_hri_nerve_navigation" output="screen"/>
+</launch>
