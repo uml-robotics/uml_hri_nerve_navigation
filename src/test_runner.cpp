@@ -1,3 +1,11 @@
+/*
+    This file contains the TestRunner class which takes in a JSON file which should contains the definition of the test scenario which would be running multiple 
+    times automatically. The JSON file is parsed when a TestRunner object is created. The TestRunner class contains two member functions for running the test
+    scenarios repeatedly, run_test_repeatedly and run_test_in_person. run_test_repeatedly quits and restarts all the launch files after an iteration is ended, 
+    while run_test_in_person starts the simulation and map_server only once and waits for user input (through a message being published) before beginning another
+    iteration of the test (which is useful for in-person testing).
+*/
+
 #include <ros/ros.h>
 #include <iostream>
 #include <fstream>
@@ -29,11 +37,11 @@ ros::Publisher tester_status_pub;
 map<string, bool> odom_map;
 map<string, bool> goal_pose_map;
 
+// callbacks
 void tester_callback(std_msgs::String msg){
     tester_status = msg.data;
 }
 void gazebo_callback(gazebo_msgs::ModelStates msg){
-    // cout << "GZ CALLBACK------------------------" << endl;
     gazebo_active = true;
 }
 void map_callback(nav_msgs::OccupancyGrid msg){
@@ -56,6 +64,8 @@ void goal_pub_callback(geometry_msgs::PoseStamped msg){
 void tuw_callback(tuw_multi_robot_msgs::RobotInfo msg){
     tuw_active = true;
 }
+
+// function for another thread
 void tester_status_subscriber(vector<string> robot_names){
     vector<ros::Subscriber> odom_subs, goal_pub_subs;
     odom_subs.resize(robot_names.size());
@@ -85,6 +95,7 @@ void tester_status_subscriber(vector<string> robot_names){
     }
 }
 
+// data structure for a robot
 struct robot{
     string robot;
     string robot_namespace;
@@ -102,6 +113,7 @@ private:
     int number_of_robots;
     vector<Robot> robots;
 
+    // private function which resets booleans for the subscriber thread
     void reset(){
         gazebo_active = false;
         map_active = false;
@@ -142,6 +154,7 @@ public:
         }
     }
     
+    // returns a vector with robot namespaces
     vector<string> get_robot_names(){
         vector<string> temp;
         for (int i = 0; i < robots.size(); ++i){
@@ -204,6 +217,8 @@ public:
         cout << "MASTER HAS DIED" << endl << endl;
 
         reset();
+
+        // pauses the code until any keyboard input is received (not required?)
         int flag;
         cout << "Program is paused !\n" <<
             "Press Enter to continue\n";
@@ -213,6 +228,7 @@ public:
         sleep(1);
     }
 
+    // function runs the run_test functions of n (iterations) times
     void run_test_repeatedly(int iterations){
         for (int i = 0; i < iterations; ++i) {
             cout << "Running Iteration " << i + 1 << endl;
@@ -220,24 +236,23 @@ public:
             cout << "Iteration " << i + 1 << " is finished" << endl;
             cout << endl;
         }
-        
     }
 
+    // function for running test when using physical robots (launches gazebo and map server only onces) (quicker than the other one)
     void run_test_in_person(int iterations){
         cout << "Running the test with " << number_of_robots << " robots" << " with the test config: " << robots[0].nav_config << endl;
         string out = " > output.txt &";
         string launch_gazebo = "roslaunch --log uml_hri_nerve_nav_sim_resources spawn_world.launch world_path:=" + world_name + ".world" + out;
         system(launch_gazebo.c_str());
         while(!gazebo_active);
-        cout << "---------------------- GAZEBO LAUNCHED ---------------------------" << endl;
         
         // launch map (in background using &)
         string launch_map = "roslaunch --log uml_hri_nerve_navigation map_server.launch map_name:=" + map + out;
         system(launch_map.c_str());
         while (!map_active);
-        cout << "---------------------- MAP LAUNCHED ---------------------------" << endl;
-        
+
         for (int j = 0; j < iterations; ++j){
+            // publishing a pause message to avoid running another iteration without an input from user
             std_msgs::String status;
             status.data = "pause";
             tester_status_pub.publish(status);
@@ -252,17 +267,14 @@ public:
                                 to_string(robots[i].goal_position_x) + " goal_y:=" + to_string(robots[i].goal_position_y) + out;
                 system(launch_robot.c_str());
                 while (!odom_map[robots[i].robot_namespace]);
-                cout << "---------------------- ROBOT LAUNCHED ---------------------------" << endl;
                 system(launch_goal_pub.c_str());
                 while (!goal_pose_map[robots[i].robot_namespace]);
-                cout << "---------------------- GOAL_PUB LAUNCHED ---------------------------" << endl;
             }
 
             string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch mbf:=false" + out;
             system(launch_tuw.c_str());
             while (!tuw_active);
-            cout << "---------------------- TUW LAUNCHED ---------------------------" << endl;
-
+        
             // graph checker 
             string launch_graph_checker = "rosrun uml_hri_nerve_navigation graph_checker";
             system(launch_graph_checker.c_str());
@@ -284,12 +296,13 @@ public:
                 system(delete_robot.c_str());
             }
 
-            cout << "------ TESTER PAUSE -------" << endl;
+            // waits for a "continue" to received from /tester_status topic
             if (j != iterations-1){ 
                 while(tester_status != "continue"); 
             }
-            cout << "------ TESTER RUNNING -------" << endl;
         }
+
+        // kills all launch files
         system("pkill roslaunch");
         while(ros::master::check());
         cout << "MASTER HAS DIED" << endl << endl;
@@ -309,6 +322,7 @@ int main (int argc, char** argv){
     json json_file = json::parse(file);
     TestRunner test_runner(json_file);
 
+    // starting the other thread
     thread subscriberThread(tester_status_subscriber, test_runner.get_robot_names());
     subscriberThread.detach();
 

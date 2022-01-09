@@ -196,6 +196,21 @@ To create a level launch file, copy one of the premade level launch files in bot
   Example command to start logging a test that is being performed in level1 and with the fetch robot
   > roslaunch uml_hri_nerve_navigation start_loggers.launch level:=level1 robot:=fetch
 
+## Automated Navigation Tester (ANT)
+The TestRunner class takes in a JSON file which contains the test definition. The TestRunner class parses the JSON file passed in and sets up the test scenario based on the information. There are two member functions currently present in the TestRunner which can be used to run multiple iterations of the test scenario automatically:
+* **run_test_repeatedly(num_repetitions)** - Using this function for running tests quits and restarts all the launch files such as gazebo, map server, etc.
+* **run_test_in_person(num_repetitions)** - Using this function for runs gazebo simulation and map server only once and at the end of each iterations it deletes the robot models and kills the other launch files. At the end of each test iteration, there should be a string "continue" published to the /tester_status topic for continuing running another iteration of the test. This feature can be useful when setting up a physical robot back at its starting position after an iteration is ended.
+
+  Example command to start the tester:
+  > rosrun uml_hri_nerve_navigation test_runner_node
+
+  Currently the tester takes number of iterations and name of the test definition JSON file through keyboard (stdin).
+
+  Following command can be used to publish string "continue" to /tester_status topic:
+  > rostopic pub /tester_status std_msgs/String "data: 'continue'"
+
+  **Note**: The way the tester is setup currently requires test definition JSON file to be placed under the test_defs directory. A sample test definition JSON file is present in the test_defs directory. All test definition files should follow same syntax as the sample file.
+
 ## Available Arguments
 The maps that are able to be launched are the following:
   * level1

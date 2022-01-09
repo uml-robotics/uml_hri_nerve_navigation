@@ -1,3 +1,9 @@
+/*
+    The robot checker node contains the code which compares the robots odom and the goal positions for determining if the robots reached their goals. The robot checker also
+    determines if the robots havent moved for some amount of seconds (currently set to 45). If the robots reaches the goal or if the robots havent moved for 45 seconds, then
+    the robot checker node would shut itself down.
+*/
+
 #include <ros/ros.h>
 #include <bits/stdc++.h>
 #include <nav_msgs/Odometry.h>
@@ -16,7 +22,7 @@ vector<string> robots_stuck;
 vector<nav_msgs::Odometry> prev_odom_readings;
 vector<string> robot_names;
 
-//template<class T>
+// functions for sorting the odom and goal_pose vectors
 bool checkGreaterOdom(nav_msgs::Odometry first, nav_msgs::Odometry last){
     return (first.header.frame_id < last.header.frame_id);
 }
@@ -29,11 +35,11 @@ bool kill_node = false;
 bool swapped = false;
 int counter = 0;
 
+// callbacks
 void goal_callback(geometry_msgs::PoseStamped goal_msg){
     bool goal_found = false;
     for (int i = 0; i < robot_goals.size(); ++i) {
         if (robot_goals[i].header.frame_id == goal_msg.header.frame_id) {
-            //robot_goals[i] = goal_msg;
             goal_found = true;
             break;
         }
@@ -57,6 +63,7 @@ void odom_callback(nav_msgs::Odometry msg){
     }
 }
 
+// functions which compares the odom with goal position for checking if the robots reached their goals
 void checkGoalsReached(vector<nav_msgs::Odometry> odom_vector, vector<geometry_msgs::PoseStamped> goal_vector){
     bool found;
     if (robots_reached.size() == odom_vector.size()){
@@ -64,8 +71,6 @@ void checkGoalsReached(vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
     }
     for(int i = 0; i < odom_vector.size(); ++i){
         found = false;
-        // cout  << "ODOM_X: " << odom_vector[i].pose.pose.position.x << " :::: GOAL: " << goal_vector[i].pose.position.x << endl;
-        // cout  << "ODOM_Y: " << odom_vector[i].pose.pose.position.y << " :::: GOAL: " << goal_vector[i].pose.position.y << endl;
         if (abs(odom_vector[i].pose.pose.position.x - goal_vector[i].pose.position.x) < 0.4
          && abs(odom_vector[i].pose.pose.position.y - goal_vector[i].pose.position.y) < 0.4) {
             for (int j = 0; j < robots_reached.size(); ++j){
@@ -80,11 +85,11 @@ void checkGoalsReached(vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
                 cout << temp << " successfully reached its goal...." << endl;
                 robots_reached.push_back(odom_vector[i].header.frame_id);
             }
-            cout << "REACHED_SIZE: " << robots_reached.size() << endl;
         }
     }
 }
 
+// function for checking if the robots havent moved for 45 seconds (if they havent reached their goals already)
 void checkRobotsStuck (vector<nav_msgs::Odometry> odom_vector, vector<geometry_msgs::PoseStamped> goal_vector){
     bool robots_stuck = false;
     if (prev_odom_readings.size() == 0){
@@ -114,6 +119,7 @@ void checkRobotsStuck (vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
     }
 }
 
+// function for another thread for getting the time
 void time_counter(chrono::steady_clock::time_point start){
     fstream outFile;
     while(true) {
@@ -132,6 +138,7 @@ int main(int argc, char** argv){
 
     auto start = std::chrono::steady_clock::now();
 
+    // another thread is started for counting time
     thread time_counter_thread(time_counter, start);
     string robot_names_str = "pioneer,pioneer_bot";
 
@@ -145,6 +152,7 @@ int main(int argc, char** argv){
     vector<ros::Subscriber> odom_subs;
     vector<ros::Subscriber> goal_subs;
 
+    // the robot names string is seperated into robot namespaces under the loop, also odoms and goal_poses are subscribed
     stringstream ss(robot_names_str);
     while(ss.good()){
         string temp;
@@ -158,6 +166,7 @@ int main(int argc, char** argv){
 
     ros::Rate rate(1);
     while(ros::ok()){
+        // if the odoms and goal_pose are subscribed then the odom and goal_pose vector are sorted (makes it easy for comparing)
         if (!vectors_sorted && robot_odoms.size() == odom_subs.size()){
             time_counter_thread.detach();
             sort(robot_odoms.begin(), robot_odoms.end(), checkGreaterOdom);
@@ -166,9 +175,11 @@ int main(int argc, char** argv){
         }
         else if (vectors_sorted){
             checkGoalsReached(robot_odoms, robot_goals);
+            // every 15 seconds check if the robots are stuck
             if (seconds != 0 && seconds % 15 == 0){
                 checkRobotsStuck(robot_odoms, robot_goals);
             }
+            // the kill_node boolean is true then the node should shut down
             if (kill_node){
                 ros::shutdown();
             }
