@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="world_name" default="nerve2"/>
+    <arg name="level" default="nerve2_base_world"/>
+
+    <arg name="robot1_x" default="0.0"/>
+    <arg name="robot1_y" default="0.0"/>
+    <arg name="robot2_x" default="0.0"/>
+    <arg name="robot2_y" default="8.0"/>
+
+    <arg name="test" default="tuw"/>
+
+    <!-- TEST WITH TUW WITHOUT OBSTACLE AVOIDANCE -->
+    <group if="$(eval test == 'tuw')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
+            <arg name="launch_robot" value="true"/>
+            <arg name="world_path" value="$(arg world_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="x" value="$(arg robot1_x)"/>
+            <arg name="y" value="$(arg robot1_y)"/>
+            <arg name="mbf" value="false"/>
+            <arg name="move_base" value="false"/>
+            <arg name="tuw" value="true"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+            <arg name="robot_name" value="pioneer_bot"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="x" value="$(arg robot2_x)"/>
+            <arg name="y" value="$(arg robot2_y)"/>
+            <arg name="mbf" value="false"/>
+            <arg name="move_base" value="false"/>
+            <arg name="tuw" value="true"/>
+        </include>
+            
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/tuw.launch">
+            <arg name="mbf" value="false"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_logger.launch">
+            <arg name="robot" value="pioneer"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_logger.launch">
+            <arg name="robot" value="pioneer_bot"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
+            <arg name="robot_name" value="pioneer"/>
+            <arg name="goal_x" value="6.0"/>
+            <arg name="goal_y" value="0.0"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
+            <arg name="robot_name" value="pioneer_bot"/>
+            <arg name="goal_x" value="6.0"/>
+            <arg name="goal_y" value="8.0"/>
+        </include>
+    </group>
+
+    <!-- TEST WITH TUW AND MOVE_BASE_FLEX -->
+    <group if="$(eval test == 'tuw_mbf')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
+            <arg name="launch_robot" value="true"/>
+            <arg name="world_path" value="$(arg world_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="x" value="$(arg robot1_x)"/>
+            <arg name="y" value="$(arg robot1_y)"/>
+            <arg name="mbf" value="true"/>
+            <arg name="move_base" value="false"/>
+            <arg name="tuw" value="false"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+            <arg name="robot_name" value="pioneer_bot"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="x" value="$(arg robot2_x)"/>
+            <arg name="y" value="$(arg robot2_y)"/>
+            <arg name="mbf" value="true"/>
+            <arg name="move_base" value="false"/>
+            <arg name="tuw" value="false"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/tuw.launch">
+            <arg name="mbf" value="true"/>
+        </include>
+
+        <node name="checker_node" type="checker_node" pkg="uml_hri_nerve_navigation" output="screen" required="true">
+            <param name="robot1_name" value="pioneer"/>
+            <param name="robot2_name" value="pioneer_bot"/>
+        </node>
+    </group>
+
+    <!-- TEST WITH TWO SIMULTANEOUS NAV STACKS -->
+    <group if="$(eval test == 'nav_stack')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_test_multiple_robots.launch">
+            <arg name="launch_robot" value="true"/>
+            <arg name="world_path" value="$(arg world_name)"/>
+            <arg name="mbf" value="false"/>
+            <arg name="move_base" value="true"/>
+            <arg name="tuw" value="false"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="x" value="$(arg robot1_x)"/>
+            <arg name="y" value="$(arg robot1_y)"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+            <arg name="robot_name" value="pioneer_bot"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="mbf" value="false"/>
+            <arg name="move_base" value="true"/>
+            <arg name="tuw" value="false"/>
+            <arg name="x" value="$(arg robot2_x)"/>
+            <arg name="y" value="$(arg robot2_y)"/>
+        </include>
+
+        <!-- start rviz -->
+        <include file="$(find tuw_multi_robot_demo)/launch/rviz.launch">
+            <arg name="cfg" value="mb"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/move_base_checker.launch">
+            <arg name="robot1_name" value="pioneer"/>
+            <arg name="robot2_name" value="pioneer_bot"/>
+        </include>   
+    </group>
+
+</launch>

@@ -10,14 +10,14 @@
       "robot_namespace": "pioneer",
       "starting_position": [0, 0],
       "goal_position": [6, 0],
-      "nav_config": "tuw_config"
+      "nav_config": "tuw"
     },
     "robot_2":{
       "robot": "pioneer",
       "robot_namespace": "pioneer_bot",
       "starting_position": [0, 8],
       "goal_position": [6, 8],
-      "nav_config": "tuw_config"
+      "nav_config": "tuw"
     }
   }
 }

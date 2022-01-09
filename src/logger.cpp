@@ -29,6 +29,9 @@
 #include <tuw_local_controller_msgs/ExecutePathActionResult.h>
 //SimLog is a custom message type defined in uml_hri_nerve_navigation/msg/SimLog.msg
 #include <uml_hri_nerve_navigation/SimLog.h>
+#include <chrono>
+#include <thread>
+
 
 // Simple distance function
 float distance(float x1, float y1, float x2, float y2)
@@ -36,6 +39,30 @@ float distance(float x1, float y1, float x2, float y2)
     float dx = x2 - x1;
     float dy = y2 - y1;
     return sqrt(dx * dx + dy * dy);
+}
+
+int minutes; 
+int seconds;
+bool thread_started = false;
+void time_counter(std::chrono::steady_clock::time_point start){
+    using namespace std;
+    while(true) {
+        sleep(1);
+        auto end = std::chrono::steady_clock::now();
+        double time_elapsed = double(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+        double time_elapsed_sec = time_elapsed/1e9;
+        if (time_elapsed_sec <= 60){
+            minutes = 0;
+            seconds = time_elapsed_sec;
+        }
+        else{
+            minutes = time_elapsed_sec/60;
+            seconds = (int)time_elapsed_sec % 60;
+        }
+        // outFile.open("time.txt", ios::out);
+        // outFile << setw(2) << setfill('0') << minutes << ":" << setw(2) << setfill('0') << seconds << std::endl;
+        // outFile.close();
+    }
 }
 
 class Logger
@@ -67,6 +94,8 @@ private:
 
     std::string filePathString;
     std::string filePathVel;
+
+    int num;
 
 public:
     Logger(ros::NodeHandle n)
@@ -111,7 +140,6 @@ public:
         std::string file_path_iteration = file_path + "/num_iteration.txt";
         std::ifstream inStream;
         std::fstream outStream;
-        int num;
 
         if (!csvFile){
             int temp = 0;
@@ -139,9 +167,8 @@ public:
         oStream << "Position: (0.00, 0.00) | Distance from goal: 0.00" << std::endl; 
         oStream.close();        
 
-        csvFile << "Iteration " << num << std::endl;
+        csvFile<<"Iteration,Elapsed Time,Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Goal#,Event" << std::endl;
 
-        csvFile<<"Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Iteration,Event" << std::endl;
     };
 
     void add_velocity(geometry_msgs::Twist cmd_vel){
@@ -298,15 +325,38 @@ public:
     {
         if (publishing)
         {
+            if (!thread_started){
+                auto start = std::chrono::steady_clock::now();  
+                std::thread time_counter_thread(time_counter, start);
+                time_counter_thread.detach();
+                thread_started = true;
+            }
             //Save the current timestamp for the log
             log.header.stamp = ros::Time::now();
-            
+            std::string elapsed_time_str;
+            if (std::to_string(minutes).size() <= 1){
+                elapsed_time_str = "0" + std::to_string(minutes);
+            }
+            else{
+                elapsed_time_str = std::to_string(minutes);
+            }
+            elapsed_time_str += ":";
+            if (std::to_string(seconds).size() <= 1){
+                elapsed_time_str += "0"+std::to_string(seconds);
+            }
+            else{
+                elapsed_time_str += std::to_string(seconds);
+            }
+
+            // std::string elapsed_time_str = std::to_string(minutes) + ":" + std::to_string(seconds);
+            std::cout << "ELAPSED: " << elapsed_time_str << std::endl;
+
             //Calculate the distance from the current pos to the goal.  This line is here instead of add_position because the goal can change, 
             //but the position doesn't and the distance calculation won't be performed until the position changes
             log.dist_from_goal = distance(log.goal.x, log.goal.y, log.robot_pos.x, log.robot_pos.y);
             
             //Write the contents of the log msg to the csv file (replace with publisher .publish if you want to publish a sim_log topic)
-            csvFile << std::to_string(log.header.stamp.toNSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
+            csvFile <<  num << "," << elapsed_time_str << "," << std::to_string(log.header.stamp.toSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
                     log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
                     std::to_string(log.iteration) << "," << log.event << std::endl;
             
