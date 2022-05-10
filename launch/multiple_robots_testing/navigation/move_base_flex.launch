@@ -5,7 +5,7 @@
     <param name="tf_timeout" value="1.5"/>
     <param name="robot_frame" value="$(arg robot_name)/base_link"/>
     <param name="planner_max_retries" value="3"/>
-    <remap from="frontscan_filtered" to="$(arg robot_name)/frontscan_filtered"/>
+    <!-- <remap from="frontscan_filtered" to="$(arg robot_name)/frontscan_filtered"/> -->
     <remap from="cmd_vel" to="$(arg robot_name)/cmd_vel"/>
     <remap from="odom" to="$(arg robot_name)/odom"/>
     <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/planners.yaml" command="load" />

@@ -1,0 +1,20 @@
+digraph G {
+"pioneer/odom" -> "pioneer/base_link"[label="Broadcaster: /gazebo\nAverage rate: 50.202 Hz\nMost recent transform: 1114.746 ( 0.019 sec old)\nBuffer length: 4.940 sec\n"];
+"map" -> "pioneer/odom"[label="Broadcaster: /pioneer_amcl\nAverage rate: 20.196 Hz\nMost recent transform: 1114.836 ( -0.071 sec old)\nBuffer length: 5.100 sec\n"];
+"pioneer/base_link" -> "pioneer/p3dx_right_wheel"[label="Broadcaster: /gazebo\nAverage rate: 60.121 Hz\nMost recent transform: 1114.746 ( 0.019 sec old)\nBuffer length: 4.940 sec\n"];
+"pioneer/base_link" -> "pioneer/p3dx_left_wheel"[label="Broadcaster: /gazebo\nAverage rate: 60.121 Hz\nMost recent transform: 1114.746 ( 0.019 sec old)\nBuffer length: 4.940 sec\n"];
+"pioneer/base_link" -> "pioneer/back_sonar"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/base_link" -> "pioneer/hokuyo_front_link"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/base_link" -> "pioneer/front_sonar"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/p3dx_left_wheel" -> "pioneer/p3dx_left_hubcap"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/p3dx_right_wheel" -> "pioneer/p3dx_right_hubcap"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/base_link" -> "pioneer/top_plate"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/center_wheel" -> "pioneer/center_hubcap"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/swivel_link" -> "pioneer/center_wheel"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10.208 Hz\nMost recent transform: 1114.686 ( 0.079 sec old)\nBuffer length: 4.800 sec\n"];
+"pioneer/base_link" -> "pioneer/weight_link"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 1114.765 sec old)\nBuffer length: 0.000 sec\n"];
+"pioneer/base_link" -> "pioneer/swivel_link"[label="Broadcaster: /pioneer_state_publisher\nAverage rate: 10.208 Hz\nMost recent transform: 1114.686 ( 0.079 sec old)\nBuffer length: 4.800 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1114.765"[ shape=plaintext ] ;
+ }->"map";
+}

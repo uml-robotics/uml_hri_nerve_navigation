@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         goals.robots[i].destinations[0].orientation.x = 0.0;
         goals.robots[i].destinations[0].orientation.y = 0.0;
         goals.robots[i].destinations[0].orientation.z = 0.0;
-        goals.robots[i].destinations[0].orientation.w = 1.0;
+        goals.robots[i].destinations[0].orientation.w = 1;
 
     }
  

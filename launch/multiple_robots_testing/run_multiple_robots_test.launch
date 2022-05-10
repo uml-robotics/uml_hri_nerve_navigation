@@ -33,7 +33,7 @@
             <arg name="move_base" value="false"/>
             <arg name="tuw" value="true"/>
         </include>
-            
+        
         <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/tuw.launch">
             <arg name="mbf" value="false"/>
         </include>
@@ -42,21 +42,11 @@
             <arg name="robot" value="pioneer"/>
         </include>
 
-        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw_logger.launch">
-            <arg name="robot" value="pioneer_bot"/>
-        </include>
-
         <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
             <arg name="robot_name" value="pioneer"/>
-            <arg name="goal_x" value="6.0"/>
+            <arg name="goal_x" value="2.0"/>
             <arg name="goal_y" value="0.0"/>
-        </include>
-
-        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tester_goal_publisher.launch">
-            <arg name="robot_name" value="pioneer_bot"/>
-            <arg name="goal_x" value="6.0"/>
-            <arg name="goal_y" value="8.0"/>
-        </include>
+        </include>e
     </group>
 
     <!-- TEST WITH TUW AND MOVE_BASE_FLEX -->
@@ -105,25 +95,11 @@
             <arg name="y" value="$(arg robot1_y)"/>
         </include>
 
-        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
-            <arg name="robot_name" value="pioneer_bot"/>
-            <arg name="level" value="$(arg level)"/>
-            <arg name="mbf" value="false"/>
-            <arg name="move_base" value="true"/>
-            <arg name="tuw" value="false"/>
-            <arg name="x" value="$(arg robot2_x)"/>
-            <arg name="y" value="$(arg robot2_y)"/>
-        </include>
-
         <!-- start rviz -->
         <include file="$(find tuw_multi_robot_demo)/launch/rviz.launch">
             <arg name="cfg" value="mb"/>
         </include>
 
-        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/move_base_checker.launch">
-            <arg name="robot1_name" value="pioneer"/>
-            <arg name="robot2_name" value="pioneer_bot"/>
-        </include>   
     </group>
 
 </launch>

@@ -165,6 +165,7 @@ add_executable(dord_calculator src/dord_calculator.cpp)
 add_executable(pose_publisher src/pose_publisher.cpp)
 
 add_executable(ob_mover src/ob_mover.cpp)
+add_executable(tuw_mb_mover src/tuw_mb_mover.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -185,6 +186,12 @@ add_dependencies(pose_publisher ${pose_publisher_EXPORTED_TARGETS} ${catkin_EXPO
 
 add_dependencies(ob_mover ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+add_dependencies(tuw_mb_mover ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(tuw_mb_mover
+        ${catkin_LIBRARIES}
+        )
+
 #### FILES FOR MULTIPLE ROBOT NAVIGATION ####
 
 add_executable(mbf_mover_node src/mbf_mover.cpp)
@@ -199,9 +206,15 @@ add_executable(robot_checker_node src/robot_checker.cpp)
 
 add_executable(tester_goal_pub_node src/tester_goal_publisher.cpp)
 
+add_executable(ant src/automated_navigation_tester.cpp)
+add_dependencies(ant ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ant
+  ${catkin_LIBRARIES}
+)
+
 target_link_libraries(tester_goal_pub_node
-        ${catkin_LIBRARIES}
-        )
+  ${catkin_LIBRARIES}
+)
 
 target_link_libraries(mbf_mover_node
   ${catkin_LIBRARIES}

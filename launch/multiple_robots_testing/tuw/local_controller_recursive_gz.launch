@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <launch>
-  <arg name="nr_of_robots" default="2"/>
+  <arg name="nr_of_robots" default="1"/>
   <arg name="robot_name" default="pioneer"/>
   <arg name="mbf" default="true" />
   <!-- reduce the loop counter "nr_of_robots-1" = robot_id -->

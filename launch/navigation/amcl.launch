@@ -5,9 +5,9 @@
 	<arg name="obstacle_bot" default="false" />
 
 	<!-- Topic remappings-->
-	<arg name="scan_topic" default="base_scan" />
-  	<arg name="odom_link" default="odom" />
-  	<arg name="base_link" default="base_link" />
+  <arg name="scan_topic" default="pioneer/frontscan" />
+  <arg name="odom_link" default="pioneer/odom" />
+  <arg name="base_link" default="pioneer/base_link" />
 
 	<!-- AMCL Node -->
 	<node pkg="amcl" type="amcl" name="amcl" unless="$(arg obstacle_bot)" output="screen">

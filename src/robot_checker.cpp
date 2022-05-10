@@ -65,14 +65,21 @@ void odom_callback(nav_msgs::Odometry msg){
 
 // functions which compares the odom with goal position for checking if the robots reached their goals
 void checkGoalsReached(vector<nav_msgs::Odometry> odom_vector, vector<geometry_msgs::PoseStamped> goal_vector){
+     cout << "CHECKER_NODE: COMPARING TWO POSITIONS" << endl;
+     ROS_WARN("CHECKER_NODE: COMPARING TWO POSITIONS");
+
     bool found;
     if (robots_reached.size() == odom_vector.size()){
         kill_node = true;
     }
     for(int i = 0; i < odom_vector.size(); ++i){
+
+        cout << "CHECKER_NODE: ODOM: " << odom_vector[i].pose.pose.position.x << ", GOAL: " << goal_vector[i].pose.position.x << endl;
+
         found = false;
-        if (abs(odom_vector[i].pose.pose.position.x - goal_vector[i].pose.position.x) < 0.4
-         && abs(odom_vector[i].pose.pose.position.y - goal_vector[i].pose.position.y) < 0.4) {
+        if (abs(odom_vector[i].pose.pose.position.x - goal_vector[i].pose.position.x) <= 0.6
+         && abs(odom_vector[i].pose.pose.position.y - goal_vector[i].pose.position.y) <= 0.6
+         && abs(odom_vector[i].pose.pose.orientation.w - goal_vector[i].pose.orientation.w) < 0.02) {
             for (int j = 0; j < robots_reached.size(); ++j){
                 if (robots_reached[j] == odom_vector[i].header.frame_id){
                     found = true;
@@ -111,7 +118,7 @@ void checkRobotsStuck (vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
             }
             prev_odom_readings[i] = odom_vector[i];
         }
-        if (robots_stuck && seconds >= 45){
+        if (robots_stuck && seconds >= 60){
             cout << "Shutting down the node due to robot(s) being stuck" << endl;
             kill_node = true;
             return;

@@ -34,8 +34,21 @@ bool tuw_active = false;
 string tester_status = "";
 ros::Publisher tester_status_pub; 
 
+double xOdom, yOdom;
+double xGoal, yGoal;
+
 map<string, bool> odom_map;
 map<string, bool> goal_pose_map;
+
+std::fstream oStream;
+
+
+float distance(float x1, float y1, float x2, float y2)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
 
 // callbacks
 void tester_callback(std_msgs::String msg){
@@ -48,6 +61,15 @@ void map_callback(nav_msgs::OccupancyGrid msg){
     map_active = true;
 }
 void odom_callback(nav_msgs::Odometry msg){
+    // ROS_INFO("(%f, %f, %f)", msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.orientation.w);
+    xOdom = msg.pose.pose.position.x;
+    yOdom = msg.pose.pose.position.y;
+    oStream.open("pose.txt", std::ios::out);
+    oStream.setf(std::ios::fixed);
+    oStream.setf(std::ios::showpoint);
+    oStream.precision(2);
+    oStream << "Position: (" << xOdom << ", " << yOdom << ") | Distance from goal: " << distance(xGoal, yGoal, xOdom, yOdom) << std::endl; 
+    oStream.close();
     string temp;
     stringstream ss(msg.header.frame_id);
     getline(ss, temp, '/');
@@ -62,6 +84,7 @@ void goal_pub_callback(geometry_msgs::PoseStamped msg){
     goal_pose_map[temp] = true;
 }
 void tuw_callback(tuw_multi_robot_msgs::RobotInfo msg){
+//    cout << "--------------------------------------------------- TUW IS RUNNING --------------------------------------------------------------" << endl;
     tuw_active = true;
 }
 
@@ -78,6 +101,7 @@ void tester_status_subscriber(vector<string> robot_names){
     ros::Subscriber gazebo_sub = nh.subscribe("gazebo/model_states", 1000, gazebo_callback);
     ros::Subscriber map_sub = nh.subscribe("map", 1000, map_callback);
     ros::Subscriber tuw_sub = nh.subscribe("robot_info", 1000, tuw_callback);
+
 
     for (int i = 0; i < robot_names.size(); ++i){
         odom_map[robot_names[i]] = false;
@@ -152,6 +176,8 @@ public:
                 robot_goals_str += ",";
             }
         }
+        xGoal = robots[0].goal_position_x;
+        yGoal = robots[0].goal_position_y;
     }
     
     // returns a vector with robot namespaces
@@ -191,7 +217,8 @@ public:
             while (!goal_pose_map[robots[i].robot_namespace]);
         }
 
-        string launch_tuw = "roslaunch uml_hri_nerve_navigation tuw.launch mbf:=false" + out;
+        // --------------------CHANGE/CHECK world name THIS BEFORE RUNNING------------------------
+        string launch_tuw = "roslaunch uml_hri_nerve_navigation tuw.launch mbf:=false rviz_cfg:=nerve_test1" + out;
         system(launch_tuw.c_str());
         while (!tuw_active);
 
@@ -241,13 +268,13 @@ public:
     // function for running test when using physical robots (launches gazebo and map server only onces) (quicker than the other one)
     void run_test_in_person(int iterations){
         cout << "Running the test with " << number_of_robots << " robots" << " with the test config: " << robots[0].nav_config << endl;
-        string out = " > output.txt &";
+        string out = "  &";
         string launch_gazebo = "roslaunch --log uml_hri_nerve_nav_sim_resources spawn_world.launch world_path:=" + world_name + ".world" + out;
         system(launch_gazebo.c_str());
         while(!gazebo_active);
         
         // launch map (in background using &)
-        string launch_map = "roslaunch --log uml_hri_nerve_navigation map_server.launch map_name:=" + map + out;
+        string launch_map = "roslaunch uml_hri_nerve_navigation map_server.launch map_name:=" + map + out;
         system(launch_map.c_str());
         while (!map_active);
 
@@ -261,32 +288,51 @@ public:
             string launch_robot;
             string launch_goal_pub;
             for (int i = 0; i < number_of_robots; ++i){
-                launch_robot = "roslaunch --log uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
+                launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
                             " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
-                launch_goal_pub = "roslaunch --log uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
+
+                launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
                                 to_string(robots[i].goal_position_x) + " goal_y:=" + to_string(robots[i].goal_position_y) + out;
+
                 system(launch_robot.c_str());
                 while (!odom_map[robots[i].robot_namespace]);
                 system(launch_goal_pub.c_str());
                 while (!goal_pose_map[robots[i].robot_namespace]);
             }
 
-            string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch mbf:=false" + out;
-            system(launch_tuw.c_str());
-            while (!tuw_active);
-        
-            // graph checker 
-            string launch_graph_checker = "rosrun uml_hri_nerve_navigation graph_checker";
-            system(launch_graph_checker.c_str());
+            if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
+                string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch mbf:=true" + out;
+                system(launch_tuw.c_str());
+                while (!tuw_active);
+            
+                // graph checker 
+                string launch_graph_checker = "rosrun uml_hri_nerve_navigation graph_checker";
+                system(launch_graph_checker.c_str());
 
-            // launch goals (in background using &) still need to figure out when to send goals
-            string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
-                                        + robot_names_str + " robot_goals:=" + robot_goals_str + " test:=" + robots[0].nav_config + out; 
-            system(launch_goal_sender.c_str());
+                // launch goals (in background using &) still need to figure out when to send goals
+                string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
+                                            + robot_names_str + " robot_goals:=" + robot_goals_str + " test:=" + robots[0].nav_config + " num_robots:=" + to_string(number_of_robots) + out; 
+                system(launch_goal_sender.c_str());
+            }
+            else{
+                string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
+                                            + robot_names_str + " robot_goals:=" + robot_goals_str + " test:=" + robots[0].nav_config + out; 
+                system(launch_goal_sender.c_str());
+            }
 
             // launch checker
-            string launch_checker = "roslaunch --log uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + " > output.txt";
+            string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + " > checker_output.txt ";
             system(launch_checker.c_str());
+
+            int flag;
+            cout << "Program is paused !\n" <<
+                 "Press Enter to continue\n";
+            flag = getc(stdin);
+            cout << "\nContinuing .";
+
+            cout << "--------------------------------------------- TIME TO RESET --------------------------------------------- " << endl;
+            // reset_robot();
+            cout << "--------------------------------------------- RESET DONE --------------------------------------------- " << endl;
 
             string end_iteration = "rosnode list | grep -v gazebo | grep -v rosout | grep -v map | grep -v test_runner | xargs rosnode kill" + out;
             system(end_iteration.c_str());
@@ -307,15 +353,246 @@ public:
         while(ros::master::check());
         cout << "MASTER HAS DIED" << endl << endl;
     }
+
+    void in_person_test(){
+        // oStream.open(file_path_print.c_str(), std::ios::out);
+        // oStream << "Position: (0.00, 0.00) | Distance from goal: 0.00" << std::endl; 
+        // oStream.close();        
+
+        string out = " &";
+
+        // launch map server
+        // string launch_map = "roslaunch uml_hri_nerve_navigation map_server.launch map_name:=" + map + out;
+        string launch_map = "roslaunch uml_hri_nerve_navigation map_server.launch" + out;
+        system(launch_map.c_str());
+        while (!map_active);
+
+        // launch goal pub for the checker and loggers
+        string launch_robot, launch_goal_pub, launch_tuw_logger_node;
+        for (int i = 0; i < number_of_robots; ++i){
+            // launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
+            //                " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
+            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
+                           " y:=" + to_string(yOdom) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
+            
+            launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
+                              to_string(robots[i].goal_position_x) + " goal_y:=" + to_string(robots[i].goal_position_y) + out;
+            cout << "GOAL POSE FOR " << robots[i].robot_namespace << " is: (" << robots[i].goal_position_x << ", " << robots[i].goal_position_y << ") " << endl;
+            system(launch_robot.c_str());
+            while (!odom_map[robots[i].robot_namespace]);
+
+            system(launch_goal_pub.c_str());
+            while (!goal_pose_map[robots[i].robot_namespace]);
+        }
+        
+        int flag;
+        // cout << "Program is paused !\n" <<
+        //     "Press Enter to continue\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+        
+        if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
+            // launch tuw
+            string launch_tuw = "roslaunch uml_hri_nerve_navigation tuw.launch mbf:=true" + out;
+            system(launch_tuw.c_str());
+            while (!tuw_active);
+
+            string launch_graph_checker = "rosrun uml_hri_nerve_navigation graph_checker";
+            system(launch_graph_checker.c_str());
+
+            for (int i = 0; i < number_of_robots; ++i){
+                launch_tuw_logger_node = "roslaunch uml_hri_nerve_navigation tuw_logger.launch robot:=" + robots[i].robot_namespace + out;
+                system(launch_tuw_logger_node.c_str());
+            }
+        }
+
+
+        // cout << "Program is paused !\n" <<
+        //      "Press Enter to continue\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+
+        // launch goal sender 
+        string launch_goal_sender = "roslaunch uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:="
+                                    + robot_names_str + " robot_goals:=" + robot_goals_str + " test:=" + robots[0].nav_config + out; 
+        system(launch_goal_sender.c_str());
+
+        
+        // launch checker
+        string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        system(launch_checker.c_str());
+        
+        sleep(1);
+        // cout << "Program is paused !\n" <<
+        //      "Press Enter to continue\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+        string end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v map | xargs rosnode kill" + out;
+        system(end_iteration.c_str());
+        sleep(1);
+        reset_robot();
+        
+        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | xargs rosnode kill" + out;
+        system(end_iteration.c_str());
+    }
+
+    void reset_robot(){
+        string out = " &";
+
+        // if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
+        //     system("rosnode kill multi_robot_router");
+        //     system("rosnode kill rviz");
+        //     system("rosnode kill graph_generator");
+            
+        //     string kill_goal_sender = "rosnode kill tuw_goal_sender_node";
+        //     system(kill_goal_sender.c_str());
+        //     cout << "----------------- KILLED THE GOAL SENDER" << endl;
+        // }
+
+        int flag;
+
+        // string topic1, topic2, topic3;
+        // for (int i = 0; i < number_of_robots; ++i){
+        //     topic1 = "rosnode kill " + robots[i].robot_namespace + "/link1_broadcaster";
+        //     topic2 = "rosnode kill " + robots[i].robot_namespace + "/local_behavior";
+        //     topic3 = "rosnode kill " + robots[i].robot_namespace + "/self_localization";
+        //     system(topic1.c_str());
+        //     system(topic2.c_str());
+        //     system(topic3.c_str());
+        // }
+
+
+        // cout << "--------------------------------------------------------------------------------------Program is paused !\n" <<
+        //     "Press Enter to continue-------------------------------------------------------------------------------------\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+
+        xGoal = robots[0].starting_position_x;
+        yGoal = robots[0].starting_position_x;
+
+        // launch goal pub
+        string launch_goal_pub, launch_robot;
+        string robot_reset_goals_str = "";
+        for (int i = 0; i < number_of_robots; ++i){
+            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
+                           " y:=" + to_string(robots[i].goal_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
+            system(launch_robot.c_str());
+            while (!odom_map[robots[i].robot_namespace]);
+
+            launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
+                              to_string(robots[i].starting_position_x) + " goal_y:=" + to_string(robots[i].starting_position_y) + out;
+            system(launch_goal_pub.c_str());
+            while (!goal_pose_map[robots[i].robot_namespace]);
+            robot_reset_goals_str += to_string(robots[i].starting_position_x) + "," + to_string(robots[i].starting_position_y);
+            if (i != number_of_robots - 1){
+                robot_reset_goals_str += ",";
+            }
+        }
+
+
+        // cout << "--------------------------------------------------------------------------------------Program is paused !\n" <<
+        //     "Press Enter to continue-------------------------------------------------------------------------------------\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+        
+        if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
+            // launch tuw
+            string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch mbf:=true &";
+            system(launch_tuw.c_str());
+            while (!tuw_active);
+
+            string launch_graph_checker = "rosrun uml_hri_nerve_navigation graph_checker";
+            system(launch_graph_checker.c_str());
+        }
+
+
+    //    cout << "--------------------------------------------------------------------------------------Program is paused !\n" <<
+    //         "Press Enter to continue-------------------------------------------------------------------------------------\n";
+    //    flag = getc(stdin);
+    //    cout << "\nContinuing .";
+
+
+        // send goals
+        string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
+                                    + robot_names_str + " robot_goals:=" + robot_reset_goals_str + " test:=" + robots[0].nav_config + " num_robots:=" + to_string(number_of_robots) + out;
+        system(launch_goal_sender.c_str());
+
+        cout << "----------------------------------- LAUNCHED THE MOVER" << endl;
+        // checker
+        string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        system(launch_checker.c_str());
+        sleep(1);
+
+        // cout << "Program is paused !\n" <<
+        //     "Press Enter to continue\n";
+        // flag = getc(stdin);
+        // cout << "\nContinuing .";
+
+    }
+
+    void run_in_person_test_repeatedly(int iterations){
+        for (int i = 0; i < iterations; ++i){
+            cout << "----------------------------------------------- RUNNING ITERATION: " << i + 1 << 
+            " -----------------------------------------------" << endl;
+            
+            in_person_test();
+
+            cout << "----------------------------------------------- ENDING ITERATION: " << i + 1 << 
+            " -----------------------------------------------" << endl;
+
+            // system("rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=pioneer/cmd_vel");
+            
+            // while(tester_status != "continue");
+            // tester_status = "pause";
+
+            sleep(2);
+            // int flag;
+            // cout << "Program is paused !\n" <<
+            //     "Press Enter to continue\n";
+            // flag = getc(stdin);
+            // cout << "\nContinuing .";
+
+            xGoal = robots[0].goal_position_x;
+            yGoal = robots[0].goal_position_y;
+
+            // system("rosnode kill /teleop_twist_keyboard");            
+        }
+    }
 };  
+
+void time_counter(chrono::steady_clock::time_point start){
+    fstream outFile;
+    while(true) {
+        sleep(1);
+        auto end = std::chrono::steady_clock::now();
+        double time_elapsed = double(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+        int minutes; int seconds;
+        double time_elapsed_sec = time_elapsed/1e9;
+        if (time_elapsed_sec <= 60){
+            minutes = 0;
+            seconds = time_elapsed_sec;
+        }
+        else{
+            minutes = time_elapsed_sec/60;
+            seconds = (int)time_elapsed_sec % 60;
+        }
+        outFile.open("time.txt", ios::out);
+        outFile << setw(2) << setfill('0') << minutes << ":" << setw(2) << setfill('0') << seconds << std::endl;
+        outFile.close();
+    }
+}
 
 int main (int argc, char** argv){
     ros::init(argc, argv, "test_runner");
-    
+    auto start = std::chrono::steady_clock::now();
+
+    thread time_counter_thread(time_counter, start);
+    time_counter_thread.detach();
+
     string file_path = " ", file_name = " ";
     int num_iterations = 2;
 
-    file_name = "sample_test.json";
+    file_name = "test_1.json";
     file_path = "src/uml_hri_nerve_navigation/test_defs/" + file_name;
 
     fstream file(file_path, ios::in); // file path is in the directory where the executable is
@@ -326,7 +603,9 @@ int main (int argc, char** argv){
     thread subscriberThread(tester_status_subscriber, test_runner.get_robot_names());
     subscriberThread.detach();
 
-    test_runner.run_test_in_person(2);
+    //  test_runner.run_in_person_test_repeatedly(2);
+    cout << "THE CODE IS RUNNING TILL HERE: 1" << endl;
+    test_runner.run_in_person_test_repeatedly(31);
 
     system("clear");
 

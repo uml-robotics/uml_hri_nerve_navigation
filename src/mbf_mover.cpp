@@ -69,6 +69,7 @@ int main(int argc, char** argv){
         ROS_INFO("Waiting for Move Base server to come up");
     }
     
+    
     ros::Publisher test_status_pub = nh.advertise<std_msgs::Bool>(status_topic, 1000, true);
     goal_pub = nh.advertise<geometry_msgs::Pose2D>(goal_topic, 1000, true);
     result_pub = nh.advertise<std_msgs::Bool>(result_topic, 1000, true);

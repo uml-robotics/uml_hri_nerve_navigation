@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>uml_hri_nerve_navigation</name>
+  <version>0.0.0</version>
+  <description>The uml_hri_nerve_navigation package</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="charlie@todo.todo">charlie</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+
+  <!-- Url tags are optional, but multiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/uml_hri_nerve_navigation</url> -->
+
+
+  <!-- Author tags are optional, multiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintainers, but could be -->
+  <!-- Example: -->
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+
+  <!-- The *depend tags are used to specify dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <!-- Examples: -->
+  <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->
+  <!--   <depend>roscpp</depend> -->
+  <!--   Note that this is equivalent to the following: -->
+  <!--   <build_depend>roscpp</build_depend> -->
+  <!--   <exec_depend>roscpp</exec_depend> -->
+  <!-- Use build_depend for packages you need at compile time: -->
+  <!--   <build_depend>message_generation</build_depend> -->
+  <!-- Use build_export_depend for packages you need in order to build against this package: -->
+  <!--   <build_export_depend>message_generation</build_export_depend> -->
+  <!-- Use buildtool_depend for build tool packages: -->
+  <!--   <buildtool_depend>catkin</buildtool_depend> -->
+  <!-- Use exec_depend for packages you need at runtime: -->
+  <!--   <exec_depend>message_runtime</exec_depend> -->
+  <!-- Use test_depend for packages you need only for testing: -->
+  <!--   <test_depend>gtest</test_depend> -->
+  <!-- Use doc_depend for packages you need only for building documentation: -->
+  <!--   <doc_depend>doxygen</doc_depend> -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>laser_filters</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>move_base_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>navigation</build_depend>
+  <build_depend>fetch_ros</build_depend>
+  <build_depend>fetch_gazebo</build_depend>
+  <build_depend>mir_robot</build_depend>
+  <build_depend>gmapping</build_depend>
+  <build_depend>hector_geotiff</build_depend>
+  <build_depend>hector_trajectory_server</build_depend>
+  <build_depend>octomap</build_depend>
+  <build_depend>octomap_msgs</build_depend>
+  <build_depend>octomap_ros</build_depend>
+  <build_depend>octomap_rviz_plugins</build_depend>
+  <build_depend>octomap_server</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>pointcloud_to_laserscan</build_depend>
+  <build_depend>spatio_temporal_voxel_layer</build_depend>
+  <build_depend>teleop_twist_keyboard</build_depend>
+  <build_depend>tf2</build_depend>
+  <build_depend>tf2_ros</build_depend>
+
+  <build_depend>tuw_local_controller_msgs</build_depend>
+  <build_depend>tuw_multi_robot_msgs</build_depend>
+
+  <build_export_depend>laser_filters</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>std_srvs</build_export_depend>
+  <build_export_depend>move_base_msgs</build_export_depend>
+  <build_export_depend>actionlib</build_export_depend>
+  <build_export_depend>gazebo_msgs</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>navigation</build_export_depend>
+  <build_export_depend>fetch_ros</build_export_depend>
+  <build_export_depend>fetch_gazebo</build_export_depend>
+  <build_export_depend>mir_robot</build_export_depend>
+  <build_export_depend>gmapping</build_export_depend>
+  <build_export_depend>hector_geotiff</build_export_depend>
+  <build_export_depend>hector_trajectory_server</build_export_depend>
+  <build_export_depend>octomap</build_export_depend>
+  <build_export_depend>octomap_msgs</build_export_depend>
+  <build_export_depend>octomap_ros</build_export_depend>
+  <build_export_depend>octomap_rviz_plugins</build_export_depend>
+  <build_export_depend>octomap_server</build_export_depend>
+  <build_export_depend>pcl_ros</build_export_depend>
+  <build_export_depend>pointcloud_to_laserscan</build_export_depend>
+  <build_export_depend>spatio_temporal_voxel_layer</build_export_depend>
+  <build_export_depend>teleop_twist_keyboard</build_export_depend>
+  <build_export_depend>tf2</build_export_depend>
+  <build_export_depend>tf2_ros</build_export_depend>
+
+  <build_export_depend>tuw_local_controller_msgs</build_export_depend>
+  <build_export_depend>tuw_multi_robot_msgs</build_export_depend>
+  <exec_depend>tuw_local_controller_msgs</exec_depend>
+  <exec_depend>tuw_multi_robot_msgs</exec_depend>
+
+  <exec_depend>laser_filters</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>move_base_msgs</exec_depend>
+  <exec_depend>actionlib</exec_depend>
+  <exec_depend>gazebo_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>navigation</exec_depend>
+  <exec_depend>fetch_ros</exec_depend>
+  <exec_depend>fetch_gazebo</exec_depend>
+  <exec_depend>mir_robot</exec_depend>
+  <exec_depend>gmapping</exec_depend>
+  <exec_depend>hector_geotiff</exec_depend>
+  <exec_depend>hector_trajectory_server</exec_depend>
+  <exec_depend>octomap</exec_depend>
+  <exec_depend>octomap_msgs</exec_depend>
+  <exec_depend>octomap_ros</exec_depend>
+  <exec_depend>octomap_rviz_plugins</exec_depend>
+  <exec_depend>octomap_server</exec_depend>
+  <exec_depend>pcl_ros</exec_depend>
+  <exec_depend>pointcloud_to_laserscan</exec_depend>
+  <exec_depend>spatio_temporal_voxel_layer</exec_depend>
+  <exec_depend>teleop_twist_keyboard</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

@@ -1,0 +1,24 @@
+{
+    "map":{
+      "world_name": "nerve2/nerve2_base_world",
+      "map_name": "nerve2_base_world"
+    },
+    "robots":{
+      "number_of_robots": 2,
+      "robot_1":{
+        "robot": "pioneer",
+        "robot_namespace": "pioneer",
+        "starting_position": [0, 0],
+        "goal_position": [4, 12],
+        "nav_config": "tuw_mbf"
+      },
+      "robot_2":{
+        "robot": "pioneer",
+        "robot_namespace": "pioneer_bot",
+        "starting_position": [0, 20],
+        "goal_position": [4, 8],
+        "nav_config": "tuw_mbf"
+      }
+    }
+  }
+  

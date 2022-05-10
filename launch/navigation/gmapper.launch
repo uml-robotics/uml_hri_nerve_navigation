@@ -1,19 +1,19 @@
 <launch>
   <!-- Doc: http://wiki.ros.org/gmapping -->
 
-  <arg name="scan_topic" default="base_scan" />
-  <arg name="odom_link" default="odom" />
-  <arg name="base_link" default="base_link" />
+  <arg name="scan_topic" default="pioneer/frontscan" />
+  <arg name="odom_link" default="pioneer/odom" />
+  <arg name="base_link" default="pioneer/base_link" />
 
   <!-- Launch Gmapper without a namespace if no namespace is given -->
   <node name="slam_mapping" pkg="gmapping" type="slam_gmapping">
     <remap from="scan" to="$(arg scan_topic)" />
     <remap from="map" to="/map" />
     <remap from="map_metadata" to="/map_metadata" />
-    <param name="xmin" value="-20.0" />
-    <param name="ymin" value="-20.0" />
-    <param name="xmax" value="20.0" />
-    <param name="ymax" value="20.0" />
+    <param name="xmin" value="-6.0" />
+    <param name="ymin" value="-6.0" />
+    <param name="xmax" value="6.0" />
+    <param name="ymax" value="6.0" />
     <param name="delta" value="0.1" />
     <param name="map_update_interval" value=".5" />
     <param name="map_frame" value="map" />

@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
     goal_pose.header.frame_id = topic_name;
     goal_pose.pose.position.x = goal_x;
     goal_pose.pose.position.y = goal_y;
+    goal_pose.pose.orientation.w = 1;
 
     ros::Rate rate(1);
     while(ros::ok()){

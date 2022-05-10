@@ -31,6 +31,7 @@
 #include <uml_hri_nerve_navigation/SimLog.h>
 #include <chrono>
 #include <thread>
+#include <nav_msgs/Odometry.h>
 
 
 // Simple distance function
@@ -100,6 +101,8 @@ private:
 public:
     Logger(ros::NodeHandle n)
     {
+
+        std::cout << "------------------------------------------------- THIS VERSION OF LOGGER IS RUNNING ---------------------------------------------" << std::endl;
         //Setup variable defaults
         nh = n;
         collision_num = 0;
@@ -153,15 +156,32 @@ public:
             outStream << temp;
             outStream.close();
         }
+        std::string strTemp;
 
         inStream.open(file_path_iteration.c_str());
         inStream >> num;
+        if (num != 0) {
+            inStream >> strTemp;
+        }
         inStream.close();
 
-        num++;
-        outStream.open(file_path_iteration.c_str(), std::ios::out);
-        outStream << num;
-        outStream.close();
+
+        ROS_ERROR("--------------------------------------------------- LOGGER: |%d|%s|----------------------------------------------------", num, strTemp.c_str());
+
+         if (num == 0 || strTemp == "(Reset)") {
+            ROS_ERROR("----------------------------------------------------------------- HERE");
+            num++;
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << num;
+            outStream << " (Navigation)";
+            outStream.close();
+        }
+        else if (strTemp == "(Navigation)") {
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << num;
+            outStream << " (Reset)";
+            outStream.close();
+        }
 
         oStream.open(file_path_print.c_str(), std::ios::out);
         oStream << "Position: (0.00, 0.00) | Distance from goal: 0.00" << std::endl; 
@@ -172,6 +192,8 @@ public:
     };
 
     void add_velocity(geometry_msgs::Twist cmd_vel){
+        ROS_ERROR("--------------------------------------------------- LOGGER VELOCITY ----------------------------------------------------");
+
         std::fstream velFile;
         velFile.setf(std::ios::fixed);
         velFile.setf(std::ios::showpoint);
@@ -426,9 +448,11 @@ public:
 
 Logger *logger;
 
-void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose)
+void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose_msg)
 {
-    logger->add_position(*pose);
+    // geometry_msgs::PoseStamped pose;
+    // pose.pose = pose_msg->pose.pose;
+    logger->add_position(*pose_msg);
 }
 void velocity_callback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
 {
@@ -510,7 +534,7 @@ int main(int argc, char **argv)
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
     ros::Subscriber test_status = n.subscribe("test_status", 10, test_status_callback);
     ros::Subscriber goal_sub = n.subscribe("goal", 10, mbf_goal_callback);
-    // ros::Subscriber vel_sub = n.subscribe("cmd_vel", 10, velocity_callback);
+    ros::Subscriber vel_sub = n.subscribe("cmd_vel", 10, velocity_callback);                // ======================= HARD CODED
     ros::Subscriber move_base_result;
 
     if (mbf) {

@@ -3,16 +3,16 @@
     <arg name="y" default="18.0"/>
     <arg name="robot_name" default="pioneer"/>
     <arg name="level" default="nerve2_base_world"/>
-    <arg name="mbf" default="false"/>
+    <arg name="mbf" default="true"/>
     <arg name="move_base" default="false"/>
-    <arg name="tuw" default="true"/>
+    <arg name="tuw" default="false"/>
     <arg name="iteration" default="1"/>
 
-    <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/robots/spawn_pioneer.launch">
+    <!-- <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/robots/spawn_pioneer.launch">
         <arg name="x" value="$(arg x)" />
         <arg name="y" value="$(arg y)" />
         <arg name="model_type" value="$(arg robot_name)"/>
-    </include>
+    </include> -->
 
     <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pose_publisher.launch">
         <arg name="robot" value="$(arg robot_name)" />
