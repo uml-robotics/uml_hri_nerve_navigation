@@ -592,7 +592,7 @@ int main (int argc, char** argv){
     string file_path = " ", file_name = " ";
     int num_iterations = 2;
 
-    file_name = "test_1.json";
+    file_name = "nerve2_tuw_mbf_single_robot.json";
     file_path = "src/uml_hri_nerve_navigation/test_defs/" + file_name;
 
     fstream file(file_path, ios::in); // file path is in the directory where the executable is
@@ -605,7 +605,7 @@ int main (int argc, char** argv){
 
     //  test_runner.run_in_person_test_repeatedly(2);
     cout << "THE CODE IS RUNNING TILL HERE: 1" << endl;
-    test_runner.run_in_person_test_repeatedly(31);
+    test_runner.run_test_in_person(2);
 
     system("clear");
 

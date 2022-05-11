@@ -143,12 +143,15 @@ class TestRunner{
     }
 
     void run(int num_repetitions, bool simulation, bool auto_reset) {
+        bool gazebo_launched = false;
         for (int i = 0; i < num_repetitions; ++i) {
-            string out = "  &";
             if (simulation) {
-                string launch_gazebo = "roslaunch uml_hri_nerve_nav_sim_resources spawn_world.launch world_path:=" + world_name + ".world" + out;
-                system(launch_gazebo.c_str());
-                while(!gazebo_active);
+                if (!gazebo_launched) {
+                    string launch_gazebo = "roslaunch uml_hri_nerve_nav_sim_resources spawn_world.launch world_path:=" + world_name + ".world" + out;
+                    system(launch_gazebo.c_str());
+                    while(!gazebo_active);
+                    gazebo_launched = true;
+                }
                 string launch_spawn_robot;
                 for (int i = 0; i < number_of_robots; ++i){
                     launch_spawn_robot = "roslaunch uml_hri_nerve_nav_sim_resources spawn_pioneer.launch x:=" + 
@@ -166,7 +169,7 @@ class TestRunner{
             for (int i = 0; i < number_of_robots; ++i){
                 launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
                             " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" 
-                            + to_string(num_repetitions) + out;
+                            + to_string(num_repetitions) + " config:=" + robots[i].nav_config + out;
 
                 launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
                                 to_string(robots[i].goal_position_x) + " goal_y:=" + to_string(robots[i].goal_position_y) + out;
@@ -181,7 +184,7 @@ class TestRunner{
             if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
                 // launch tuw
                 string mbf = (robots[0].nav_config == "tuw_mbf") ? "mbf:=true" : "mbf:=false";
-                string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch " + mbf;
+                string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch " + mbf + out;
                 system(launch_tuw.c_str());
                 while (!tuw_active);
 
@@ -224,6 +227,15 @@ class TestRunner{
             sleep(1);
         }
 
+        if (simulation) {
+            system("pkill roslaunch");
+            while(ros::master::check());
+            cout << "MASTER HAS DIED" << endl << endl;
+        }
+        else { // ------------- FIGURE THIS OUT BY TESTING ----------------- ???
+            string end_test = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | xargs rosnode kill" + out;
+            system(end_test.c_str());
+        }
     }
 
     vector<string> get_robot_names(){
@@ -238,6 +250,8 @@ class TestRunner{
     string map, world_name, robot_names_str, robot_goals_str;
     int number_of_robots;
     vector<Robot> robots;
+
+    string out = "  &";
 
     // private function which resets booleans for the subscriber thread
     void reset(){
@@ -256,12 +270,12 @@ class TestRunner{
         for (int i = 0; i < number_of_robots; ++i){
             launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
                            " y:=" + to_string(robots[i].goal_position_y) + " robot_name:=" + robots[i].robot_namespace 
-                           + " iteration:=" + to_string(num_repetitions);
+                           + " iteration:=" + to_string(num_repetitions) + " config:=" + robots[i].nav_config + out;
             system(launch_robot.c_str());
             while (!odom_map[robots[i].robot_namespace]);
 
             launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
-                              to_string(robots[i].starting_position_x) + " goal_y:=" + to_string(robots[i].starting_position_y);
+                              to_string(robots[i].starting_position_x) + " goal_y:=" + to_string(robots[i].starting_position_y) + out;
             system(launch_goal_pub.c_str());
             while (!goal_pose_map[robots[i].robot_namespace]);
 
@@ -274,7 +288,7 @@ class TestRunner{
         if (robots[0].nav_config == "tuw" || robots[0].nav_config == "tuw_mbf"){
             // launch tuw
             string mbf = (robots[0].nav_config == "tuw_mbf") ? "mbf:=true" : "mbf:=false";
-            string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch " + mbf;
+            string launch_tuw = "roslaunch --log uml_hri_nerve_navigation tuw.launch " + mbf + out;
             system(launch_tuw.c_str());
             while (!tuw_active);
 
@@ -284,7 +298,7 @@ class TestRunner{
 
         string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
                                     + robot_names_str + " robot_goals:=" + robot_reset_goals_str + " test:=" + robots[0].nav_config 
-                                    + " num_robots:=" + to_string(number_of_robots);
+                                    + " num_robots:=" + to_string(number_of_robots) + out;
         system(launch_goal_sender.c_str());
 
         string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
@@ -294,17 +308,21 @@ class TestRunner{
 };
 
 int main(int argc, char* argv[]) {
+    system("roslaunch uml_hri_nerve_navigation start_roscore.launch &");
     ros::init(argc, argv, "automated_navigation_tester");
     ros::NodeHandle nh("~");
 
     string file_path, file_name;
     int num_repetitions = 1;
+    bool simulation_mode = false, auto_reset = false;
     file_name = "test_1.json";
     file_path = "src/uml_hri_nerve_navigation/test_defs/" + file_name;
     
     nh.getParam("repetitions", num_repetitions);
     nh.getParam("test_file", file_name);
     nh.param<std::string>("test_file_path", file_path, "src/uml_hri_nerve_navigation/test_defs/" + file_name);
+    nh.param<bool>("simulation_mode", simulation_mode, true);
+    nh.param<bool>("auto_reset", auto_reset, false);
 
     if (num_repetitions <= 0) {
         ROS_INFO("Invalid number of repetitions....... PLEASE RUN AGAIN.............\n");
@@ -319,12 +337,9 @@ int main(int argc, char* argv[]) {
     subscriberThread.detach();
 
     std::cout << "RUNNING TEST FILE: " << file_name << ", TEST PATH:  " << file_path << 
-            ", REPETITIONS: " << num_repetitions << std::endl;
+            ", REPETITIONS: " << num_repetitions << ", SIMULATION_MODE: " << simulation_mode << ", auto_reset: " << auto_reset << std::endl;
 
-    int flag = getc(stdin);
-    cout << "\nContinuing .";
-
-    test_runner.run(num_repetitions, true, false);
+    test_runner.run(num_repetitions, simulation_mode, auto_reset);
 
     ros::shutdown();
 

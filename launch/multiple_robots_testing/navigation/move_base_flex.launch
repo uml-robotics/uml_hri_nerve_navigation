@@ -1,5 +1,7 @@
 <launch>  
   <arg name="robot_name" default="pioneer"/>
+  <arg name="simulation"/>
+
   <node pkg="mbf_costmap_nav" type="mbf_costmap_nav" respawn="false" name="$(arg robot_name)_move_base_flex" output="screen">
     <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     <param name="tf_timeout" value="1.5"/>
@@ -8,12 +10,23 @@
     <!-- <remap from="frontscan_filtered" to="$(arg robot_name)/frontscan_filtered"/> -->
     <remap from="cmd_vel" to="$(arg robot_name)/cmd_vel"/>
     <remap from="odom" to="$(arg robot_name)/odom"/>
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/planners.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/base_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/recovery_behaviors.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="global_costmap"/>
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/local_costmap_params.yaml" command="load" />
+    <!-- <group if="$(arg simulation)"> -->
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/planners.yaml" command="load" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/base_local_planner_params.yaml" command="load" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/recovery_behaviors.yaml" command="load" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="global_costmap" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="local_costmap" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/global_costmap_params.yaml" command="load" if="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/simulation/$(arg robot_name)_mbf/local_costmap_params.yaml" command="load" if="$(arg simulation)"/>
+    <!-- </group> -->
+    <!-- <group unless="$(arg simulation)"> -->
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/planners.yaml" command="load" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/base_local_planner_params.yaml" command="load" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/recovery_behaviors.yaml" command="load" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="global_costmap" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/costmap_common_params.yaml" command="load" ns="local_costmap" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/global_costmap_params.yaml" command="load" unless="$(arg simulation)"/>
+      <rosparam file="$(find uml_hri_nerve_navigation)/resources/config/$(arg robot_name)_mbf/local_costmap_params.yaml" command="load" unless="$(arg simulation)"/>
+    <!-- </group> -->
   </node>
 </launch>
