@@ -11,6 +11,7 @@
 #include <uml_hri_nerve_navigation/Goal.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <gazebo_msgs/ContactsState.h>
 #include <std_msgs/String.h>
@@ -24,10 +25,14 @@
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <boost/filesystem.hpp>
-
-
+#include <mbf_msgs/ExePathActionResult.h>
+#include <tuw_local_controller_msgs/ExecutePathActionResult.h>
 //SimLog is a custom message type defined in uml_hri_nerve_navigation/msg/SimLog.msg
 #include <uml_hri_nerve_navigation/SimLog.h>
+#include <chrono>
+#include <thread>
+#include <nav_msgs/Odometry.h>
+
 
 // Simple distance function
 float distance(float x1, float y1, float x2, float y2)
@@ -35,6 +40,30 @@ float distance(float x1, float y1, float x2, float y2)
     float dx = x2 - x1;
     float dy = y2 - y1;
     return sqrt(dx * dx + dy * dy);
+}
+
+int minutes; 
+int seconds;
+bool thread_started = false;
+void time_counter(std::chrono::steady_clock::time_point start){
+    using namespace std;
+    while(true) {
+        sleep(1);
+        auto end = std::chrono::steady_clock::now();
+        double time_elapsed = double(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+        double time_elapsed_sec = time_elapsed/1e9;
+        if (time_elapsed_sec <= 60){
+            minutes = 0;
+            seconds = time_elapsed_sec;
+        }
+        else{
+            minutes = time_elapsed_sec/60;
+            seconds = (int)time_elapsed_sec % 60;
+        }
+        // outFile.open("time.txt", ios::out);
+        // outFile << setw(2) << setfill('0') << minutes << ":" << setw(2) << setfill('0') << seconds << std::endl;
+        // outFile.close();
+    }
 }
 
 class Logger
@@ -62,10 +91,18 @@ private:
     //Files
     std::fstream csvFile;
     std::fstream txtFile;
+    std::fstream oStream;
+
+    std::string filePathString;
+    std::string filePathVel;
+
+    int num;
 
 public:
     Logger(ros::NodeHandle n)
     {
+
+        std::cout << "------------------------------------------------- THIS VERSION OF LOGGER IS RUNNING ---------------------------------------------" << std::endl;
         //Setup variable defaults
         nh = n;
         collision_num = 0;
@@ -84,24 +121,89 @@ public:
 
         log.iteration = 0;
 
-        //Get file path from parameter
+        //Get fcsvile path from parameter
         std::string file_path;
         n.getParam(ros::this_node::getName()+"/file_path", file_path);
+        filePathString = file_path;
+        filePathVel = file_path + "/velocity.txt";
         std::string file_path_csv = file_path + "/sim_log.csv";
         std::string file_path_txt = file_path + "/config.txt";
+        std::string file_path_print = file_path + "/print.txt";
+
 
         //Create the folders
-        boost::filesystem::create_directories(file_path.c_str());
-        boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
+        //boost::filesystem::create_directories(file_path.c_str());
+        //boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
 
         //Create files
-        csvFile.open(file_path_csv.c_str(), std::ios::out);
+        csvFile.open(file_path_csv.c_str(), std::ios::out | std::ios_base::app);
         txtFile.open(file_path_txt.c_str(), std::ios::out);
+        // oStream.open(file_path_print.c_str(), std::ios::out);
 
-        //Write the headers for the csv file
-        csvFile<<"Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Iteration,Event" << std::endl;
+        std::string file_path_iteration = file_path + "/num_iteration.txt";
+        std::ifstream inStream;
+        std::fstream outStream;
+
+        if (!csvFile){
+            int temp = 0;
+            boost::filesystem::create_directories(file_path.c_str());
+            boost::filesystem::permissions(file_path.c_str(), boost::filesystem::all_all);
+            csvFile.open(file_path_csv.c_str(), std::ios::out);
+            txtFile.open(file_path_txt.c_str(), std::ios::out);
+            // oStream.open(file_path_print.c_str(), std::ios::out);
+
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << temp;
+            outStream.close();
+        }
+        std::string strTemp;
+
+        inStream.open(file_path_iteration.c_str());
+        inStream >> num;
+        if (num != 0) {
+            inStream >> strTemp;
+        }
+        inStream.close();
+
+
+        ROS_ERROR("--------------------------------------------------- LOGGER: |%d|%s|----------------------------------------------------", num, strTemp.c_str());
+
+         if (num == 0 || strTemp == "(Reset)") {
+            ROS_ERROR("----------------------------------------------------------------- HERE");
+            num++;
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << num;
+            outStream << " (Navigation)";
+            outStream.close();
+        }
+        else if (strTemp == "(Navigation)") {
+            outStream.open(file_path_iteration.c_str(), std::ios::out);
+            outStream << num;
+            outStream << " (Reset)";
+            outStream.close();
+        }
+
+        oStream.open(file_path_print.c_str(), std::ios::out);
+        oStream << "Position: (0.00, 0.00) | Distance from goal: 0.00" << std::endl; 
+        oStream.close();        
+
+        csvFile<<"Iteration,Elapsed Time,Timestamp,Robot Pos X,Robot Pos Y,Robot Pos Theta,Goal X,Goal Y,Distance From Goal,Collision X,Collision Y,Goal#,Event" << std::endl;
+
     };
 
+    void add_velocity(geometry_msgs::Twist cmd_vel){
+        ROS_ERROR("--------------------------------------------------- LOGGER VELOCITY ----------------------------------------------------");
+
+        std::fstream velFile;
+        velFile.setf(std::ios::fixed);
+        velFile.setf(std::ios::showpoint);
+        velFile.precision(2);
+        if (navigating && test_active) {
+            velFile.open(filePathVel.c_str(), std::ios::out);
+            velFile << "Velocity: Linear: " << cmd_vel.linear.x << " | Angular: " << cmd_vel.angular.z << std::endl;
+            velFile.close();
+        }
+    }
     void add_position(geometry_msgs::PoseStamped pose)
     {
         if (navigating && test_active)
@@ -208,6 +310,34 @@ public:
         }
     }
 
+    void mbf_add_goal(geometry_msgs::Pose2D goal_pose){
+        if (!navigating && test_active)
+        {
+            //Save goal pos
+            log.goal.x =  goal_pose.x;
+            log.goal.y =  goal_pose.y;
+
+            //Change nav and publish state
+            navigating = true;
+            publishing = true;
+
+            //Increment iterations
+            log.iteration++;
+
+            //Reset iteration collision counter
+            iteration_collision = 0;
+            
+            int num = log.iteration;
+
+            //Add msg log
+            std::stringstream str;
+            str << "Goal: " << num << " registered at x:" << goal_pose.x << " y:" << goal_pose.y;
+            log.event = str.str();
+            ROS_INFO("Starting iteration %d", log.iteration);
+            ROS_INFO("Goal: %d registered at x:%.3f y:%.3f", num, goal_pose.x, goal_pose.y);
+        }
+    }
+
     void set_test_status(std_msgs::Bool test_status_msg)
     {
         test_active = test_status_msg.data;
@@ -217,18 +347,51 @@ public:
     {
         if (publishing)
         {
+            if (!thread_started){
+                auto start = std::chrono::steady_clock::now();  
+                std::thread time_counter_thread(time_counter, start);
+                time_counter_thread.detach();
+                thread_started = true;
+            }
             //Save the current timestamp for the log
             log.header.stamp = ros::Time::now();
-            
+            std::string elapsed_time_str;
+            if (std::to_string(minutes).size() <= 1){
+                elapsed_time_str = "0" + std::to_string(minutes);
+            }
+            else{
+                elapsed_time_str = std::to_string(minutes);
+            }
+            elapsed_time_str += ":";
+            if (std::to_string(seconds).size() <= 1){
+                elapsed_time_str += "0"+std::to_string(seconds);
+            }
+            else{
+                elapsed_time_str += std::to_string(seconds);
+            }
+
+            // std::string elapsed_time_str = std::to_string(minutes) + ":" + std::to_string(seconds);
+            std::cout << "ELAPSED: " << elapsed_time_str << std::endl;
+
             //Calculate the distance from the current pos to the goal.  This line is here instead of add_position because the goal can change, 
             //but the position doesn't and the distance calculation won't be performed until the position changes
             log.dist_from_goal = distance(log.goal.x, log.goal.y, log.robot_pos.x, log.robot_pos.y);
-
+            
             //Write the contents of the log msg to the csv file (replace with publisher .publish if you want to publish a sim_log topic)
-            csvFile << std::to_string(log.header.stamp.toNSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
+            csvFile <<  num << "," << elapsed_time_str << "," << std::to_string(log.header.stamp.toSec()) << "," << log.robot_pos.x << "," << log.robot_pos.y << "," << log.robot_pos.theta << "," <<
                     log.goal.x << "," << log.goal.y << "," << log.dist_from_goal << "," << log.collision.x << "," << log.collision.y << "," <<
                     std::to_string(log.iteration) << "," << log.event << std::endl;
+            
 
+            std::string file_path_print = filePathString + "/print.txt";
+            oStream.open(file_path_print.c_str(), std::ios::out);
+            oStream.setf(std::ios::fixed);
+            oStream.setf(std::ios::showpoint);
+            oStream.precision(2);
+            oStream << "Position: (" << log.robot_pos.x << ", " << log.robot_pos.y << ") | Distance from goal: " << log.dist_from_goal << std::endl; 
+            oStream.close();
+
+            
             //Reset collision coords if a collision was published
             if (log.collision.x != -100000 || log.collision.y != -100000)
             {
@@ -279,14 +442,21 @@ public:
         //Closes the two files that are being written to at the end of the node's life
         csvFile.close();
         txtFile.close();
+        oStream.close();
     }
 };
 
 Logger *logger;
 
-void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose)
+void odom_callback(const geometry_msgs::PoseStamped::ConstPtr &pose_msg)
 {
-    logger->add_position(*pose);
+    // geometry_msgs::PoseStamped pose;
+    // pose.pose = pose_msg->pose.pose;
+    logger->add_position(*pose_msg);
+}
+void velocity_callback(const geometry_msgs::Twist::ConstPtr &cmd_vel)
+{
+    logger->add_velocity(*cmd_vel);
 }
 
 void collision_callback(const gazebo_msgs::ContactsState::ConstPtr &collision)
@@ -299,7 +469,32 @@ void goal_callback(const uml_hri_nerve_navigation::Goal::ConstPtr &goal)
     logger->add_goal(*goal);
 }
 
+void mbf_goal_callback(const geometry_msgs::Pose2D::ConstPtr &goal)
+{
+    logger->mbf_add_goal(*goal);
+}
+
 void state_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr &state)
+{
+    if (state->status.status == state->status.ABORTED || state->status.status == state->status.REJECTED)
+    {
+        logger->add_nav_result(false);
+    }
+
+    if (state->status.status == state->status.SUCCEEDED)
+    {
+        logger->add_nav_result(true);
+    }
+    
+}
+
+void mbf_state_callback(const std_msgs::Bool::ConstPtr &state)
+{
+    logger->add_nav_result(state->data);    
+}
+
+// tuw_local_controller_msgs/ExecutePathActionResult
+void tuw_state_callback(const tuw_local_controller_msgs::ExecutePathActionResult::ConstPtr &state)
 {
     if (state->status.status == state->status.ABORTED || state->status.status == state->status.REJECTED)
     {
@@ -326,13 +521,33 @@ int main(int argc, char **argv)
 
     ros::Rate rate(20);
     ros::AsyncSpinner spinner(5);
+    int place_holder;
+    bool mbf = false;
+    bool tuw = false;
+    n.getParam(ros::this_node::getName()+"/mbf", mbf);
+    n.getParam(ros::this_node::getName()+"/tuw", tuw);
 
-    // Setup subscribers
+    n.getParam(ros::this_node::getName()+"/iteration_number", place_holder);
+
+
     ros::Subscriber odom_sub = n.subscribe("map_pose", 1, odom_callback);
     ros::Subscriber collision_sub = n.subscribe("bumper_contact", 10, collision_callback);
-    ros::Subscriber goal_sub = n.subscribe("goal", 10, goal_callback);
-    ros::Subscriber move_base_result = n.subscribe("move_base/result", 10, state_callback);
-    ros::Subscriber test_status = n.subscribe("/test_status", 10, test_status_callback);
+    ros::Subscriber test_status = n.subscribe("test_status", 10, test_status_callback);
+    ros::Subscriber goal_sub = n.subscribe("goal", 10, mbf_goal_callback);
+    ros::Subscriber vel_sub = n.subscribe("cmd_vel", 10, velocity_callback);                // ======================= HARD CODED
+    ros::Subscriber move_base_result;
+
+    if (mbf) {
+        move_base_result = n.subscribe("result", 10, mbf_state_callback);
+    }
+    else if (tuw){
+        move_base_result = n.subscribe("result", 10, tuw_state_callback);
+    }
+    else {
+        ROS_ERROR("MBF FALSE");
+        move_base_result = n.subscribe("result", 10, state_callback);
+    }
+    
 
     logger = new Logger(n);
 

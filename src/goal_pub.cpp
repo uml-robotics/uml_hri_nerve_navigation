@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   //Create ros node
   ros::init(argc, argv, "goal_publisher");
   ros::NodeHandle n;
-
+    ROS_ERROR("GOAL PUB IS RUNNING");
   //create a goalManager object
   goalManager = new GoalManager(n);
 

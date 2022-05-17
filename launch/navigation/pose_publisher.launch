@@ -1,14 +1,23 @@
 <launch>
-
+    <arg name="robot" default="pioneer" />
     <arg name="base_link" default="base_link" />
     <arg name="publish_frequency" default="20" />
+    <!-- <arg name="obstacle_bot" default="false"/> -->
 
-    <node name="map_pose_publisher" pkg="uml_hri_nerve_navigation" type="pose_publisher">
-        <remap from="robot_pose" to="map_pose" />
+    <node name="$(arg robot)_map_pose_publisher" pkg="uml_hri_nerve_navigation" type="pose_publisher">
+        <remap from="robot_pose" to="$(arg robot)/map_pose" />
         <param name="map_frame" value="map" />
         <param name="base_frame" value="$(arg base_link)" />
         <param name="publish_frequency" value="$(arg publish_frequency)" />
         <param name="is_stamped" value="true" />
     </node>
-
+    <!-- <group unless="$(arg obstacle_bot)">
+        <node name="obsbot_map_pose_publisher" pkg="uml_hri_nerve_navigation" type="pose_publisher">
+            <remap from="robot_pose" to="obstacle_bot/map_pose" />
+            <param name="map_frame" value="map" />
+            <param name="base_frame" value="obstacle_bot_base_footprint" />
+            <param name="publish_frequency" value="$(arg publish_frequency)" />
+            <param name="is_stamped" value="true" />
+        </node>
+    </group> -->
 </launch>

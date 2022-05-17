@@ -16,7 +16,7 @@
   <!-- use a static map or use slam -->
   <arg name="use_static_map" default="true" />
 
-  <!-- Robot topic and frame mappings-->
+  <!-- Robot topic and frame obs_bot_log_file_pathmappings-->
   <arg name="laser_topic" />
   <arg name="cmd_vel_topic" />
   <arg name="odom_topic" />

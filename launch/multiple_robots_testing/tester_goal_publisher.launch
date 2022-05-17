@@ -1,0 +1,11 @@
+<launch>
+        <arg name="robot_name" default="pioneer"/>
+        <arg name="goal_x" default="0.0"/>
+        <arg name="goal_y" default="0.0"/>
+
+        <node name="$(arg robot_name)_tester_goal_publisher" type="tester_goal_pub_node" pkg="uml_hri_nerve_navigation" output="screen">
+            <param name="robot_name" value="$(arg robot_name)"/>
+            <param name="goal_x" value="$(arg goal_x)"/>
+            <param name="goal_y" value="$(arg goal_y)"/>
+        </node>
+</launch>

@@ -1,0 +1,149 @@
+<launch>
+    <arg name="x" default="6.0"/>
+    <arg name="y" default="18.0"/>
+    <arg name="robot_name" default="pioneer"/>
+    <arg name="level" default="nerve2_base_world"/>
+    <arg name="config" default="tuw_mbf"/>
+    <arg name="iteration" default="1"/>
+    <arg name="simulation" default="true"/>
+
+    <!-- <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/robots/spawn_pioneer.launch">
+        <arg name="x" value="$(arg x)" />
+        <arg name="y" value="$(arg y)" />
+        <arg name="model_type" value="$(arg robot_name)"/>
+    </include> -->
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/pose_publisher.launch">
+        <arg name="robot" value="$(arg robot_name)" />
+        <arg name="base_link" value="$(arg robot_name)/base_link" />
+    </include>
+
+
+    <group if="$(eval config == 'tuw')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+
+            <arg name="mbf" value="false"/>
+            <arg name="tuw" value="true"/>
+            <arg name="move_base" value="false"/>
+        </include>
+    </group>
+
+    <group if="$(eval config == 'tuw_mbf')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/amcl_ns.launch">
+            <arg name="namespace" value="$(arg robot_name)" />
+            <arg name="init_x" value="$(arg x)" />
+            <arg name="init_y" value="$(arg y)" />
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/move_base_flex.launch">
+            <arg name="robot_name" value="$(arg robot_name)"/>
+            <arg name="simulation" value="$(arg simulation)"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/robot_mover_mbf.launch">
+            <arg name="robot_name" value="$(arg robot_name)"/>
+        </include>
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+            <arg name="mbf" value="true"/>
+            <arg name="tuw" value="false"/>
+            <arg name="move_base" value="false"/>
+        </include>
+    </group>
+
+    <group if="$(eval config == 'nav_stack')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/amcl_ns.launch">
+            <arg name="namespace" value="$(arg robot_name)" />
+            <arg name="init_x" value="$(arg x)" />
+            <arg name="init_y" value="$(arg y)" />
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/move_base_def.launch">
+            <arg name="namespace" value="$(arg robot_name)"/>
+            <arg name="simulation" value="$(arg simulation)"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+
+            <arg name="mbf" value="false"/>
+            <arg name="tuw" value="false"/>
+            <arg name="move_base" value="true"/>
+        </include>
+    </group>
+
+
+
+<!-- 
+
+
+    <group if="$(arg mbf)">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/amcl_ns.launch">
+            <arg name="namespace" value="$(arg robot_name)" />
+            <arg name="init_x" value="$(arg x)" />
+            <arg name="init_y" value="$(arg y)" />
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/move_base_flex.launch">
+            <arg name="robot_name" value="$(arg robot_name)"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/robot_mover_mbf.launch">
+            <arg name="robot_name" value="$(arg robot_name)"/>
+        </include>
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+            <arg name="mbf" value="true"/>
+            <arg name="tuw" value="false"/>
+            <arg name="move_base" value="false"/>
+        </include>
+    </group>
+
+
+    <group if="$(arg tuw)">
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+
+            <arg name="mbf" value="false"/>
+            <arg name="tuw" value="true"/>
+            <arg name="move_base" value="false"/>
+        </include>
+    </group>
+
+    
+    <group if="$(arg move_base)">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/amcl_ns.launch">
+            <arg name="namespace" value="$(arg robot_name)" />
+            <arg name="init_x" value="$(arg x)" />
+            <arg name="init_y" value="$(arg y)" />
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/navigation/move_base_def.launch">
+            <arg name="namespace" value="$(arg robot_name)"/>
+        </include>
+
+        <include file="$(find uml_hri_nerve_navigation)/launch/start_loggers.launch" ns="$(arg robot_name)_logger"> 
+            <arg name="robot" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="iteration_number" value="$(arg iteration)"/>
+
+            <arg name="mbf" value="false"/>
+            <arg name="tuw" value="false"/>
+            <arg name="move_base" value="true"/>
+        </include>
+    </group> -->
+
+    
+
+</launch>

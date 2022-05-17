@@ -1,0 +1,11 @@
+<launch>
+    <arg name="robot_name" />
+    <node name="$(arg robot_name)_mbf_node" pkg="uml_hri_nerve_navigation" type="mbf_mover_node" output="screen"> 
+        <param name="robot_name" value="$(arg robot_name)"/>
+        <remap from="$(arg robot_name)_move_base_flex/goal" to="/$(arg robot_name)_move_base_flex/exe_path/goal"/>
+        <remap from="$(arg robot_name)_move_base_flex/status" to="/$(arg robot_name)_move_base_flex/exe_path/status"/>
+        <remap from="$(arg robot_name)_move_base_flex/feedback" to="/$(arg robot_name)_move_base_flex/exe_path/feedback"/>
+        <remap from="$(arg robot_name)_move_base_flex/cancel" to="/$(arg robot_name)_move_base_flex/exe_path/cancel"/>
+        <remap from="$(arg robot_name)_move_base_flex/result" to="/$(arg robot_name)_move_base_flex/exe_path/result"/>
+    </node>
+</launch>

@@ -1,0 +1,36 @@
+<launch>
+
+    <arg name="r1_goal_x" default="6.0"/>
+    <arg name="r1_goal_y" default="0.0"/>
+    <arg name="r2_goal_x" default="6.0"/>
+    <arg name="r2_goal_y" default="8.0"/>
+
+    <arg name="num_robots" default="1"/>
+    <arg name="robot_names" default="pioneer"/>
+    <arg name="robot_goals" default="3.0,0.0"/>
+
+    <arg name="test" default="tuw"/>
+
+    <group if="$(eval test == 'nav_stack')">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/robot_mover.launch">
+            <arg name="robot_name" value="pioneer"/>
+            <arg name="goal_x" value="2.0"/>
+            <arg name="goal_y" value="2.5"/>
+        </include>
+    </group>
+
+    <group if="$(eval test == 'tuw')">
+        <node name="tuw_goal_sender_node" pkg="uml_hri_nerve_navigation" type="tuw_goal_sender_node" output="screen">
+            <param name="num_robots" value="$(arg num_robots)"/>
+            <param name="robot_names" value="$(arg robot_names)"/>
+            <param name="robot_goals" value="$(arg robot_goals)"/>
+        </node>
+    </group>
+    <group if="$(eval test == 'tuw_mbf')">
+        <node name="tuw_goal_sender_node" pkg="uml_hri_nerve_navigation" type="tuw_goal_sender_node" output="screen">
+            <param name="num_robots" value="$(arg num_robots)"/>
+            <param name="robot_names" value="$(arg robot_names)"/>
+            <param name="robot_goals" value="$(arg robot_goals)"/>
+        </node>
+    </group>
+</launch>

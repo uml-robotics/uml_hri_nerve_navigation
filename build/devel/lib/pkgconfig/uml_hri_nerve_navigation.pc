@@ -1,0 +1,8 @@
+prefix=/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel
+
+Name: uml_hri_nerve_navigation
+Description: Description of uml_hri_nerve_navigation
+Version: 0.0.0
+Cflags: -I/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel/include
+Libs: -L${prefix}/lib 
+Requires: roscpp std_msgs std_srvs tf2 tf2_ros geometry_msgs message_runtime move_base_msgs actionlib gazebo_msgs tuw_local_controller_msgs tuw_multi_robot_msgs

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(uml_hri_nerve_navigation)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -18,6 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   actionlib
   gazebo_msgs
+  tuw_local_controller_msgs
+  tuw_multi_robot_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -124,6 +126,8 @@ catkin_package(
     move_base_msgs 
     actionlib 
     gazebo_msgs
+    tuw_local_controller_msgs
+    tuw_multi_robot_msgs
 #  DEPENDS system_lib
 )
 
@@ -160,6 +164,9 @@ add_executable(estop src/estop.cpp)
 add_executable(dord_calculator src/dord_calculator.cpp)
 add_executable(pose_publisher src/pose_publisher.cpp)
 
+add_executable(ob_mover src/ob_mover.cpp)
+add_executable(tuw_mb_mover src/tuw_mb_mover.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -176,6 +183,70 @@ add_dependencies(logger ${logger_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(estop ${estop_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(dord_calculator ${dord_calculator_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(pose_publisher ${pose_publisher_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_dependencies(ob_mover ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_dependencies(tuw_mb_mover ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(tuw_mb_mover
+        ${catkin_LIBRARIES}
+        )
+
+#### FILES FOR MULTIPLE ROBOT NAVIGATION ####
+
+add_executable(mbf_mover_node src/mbf_mover.cpp)
+add_executable(move_base_mover_node src/move_base_mover.cpp)
+add_executable(checker_node src/checker.cpp)
+add_executable(move_base_checker_node src/move_base_checker.cpp)
+add_executable(tuw_node src/tuw_node.cpp)
+add_executable(tuw_goal_sender_node src/tuw_goal_sender.cpp)
+add_executable(test_runner_node src/test_runner.cpp)
+add_executable(graph_checker src/graph_checker.cpp)
+add_executable(robot_checker_node src/robot_checker.cpp)
+
+add_executable(tester_goal_pub_node src/tester_goal_publisher.cpp)
+
+add_executable(ant src/automated_navigation_tester.cpp)
+add_dependencies(ant ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ant
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(tester_goal_pub_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(mbf_mover_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(move_base_mover_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(checker_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(move_base_checker_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(tuw_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(tuw_goal_sender_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(test_runner_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(graph_checker
+        ${catkin_LIBRARIES}
+        )
+target_link_libraries(robot_checker_node
+        ${catkin_LIBRARIES}
+        )
+#### FILES FOR MOVE BASE FLEX ####
+
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -202,6 +273,11 @@ target_link_libraries(dord_calculator
 target_link_libraries(pose_publisher
   ${catkin_LIBRARIES}
 )
+
+target_link_libraries(ob_mover
+  ${catkin_LIBRARIES}
+)
+
 
 #############
 ## Install ##

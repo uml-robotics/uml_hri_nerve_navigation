@@ -1,0 +1,35 @@
+<launch>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="8.0"/>
+    <arg name="robot_name" default="pioneer"/>
+    <arg name="level" default="nerve2_base_world"/>
+    <arg name="world_path" default="nerve2"/>
+    <arg name="launch_robot" default="true"/>
+    <arg name="mbf" default="true"/>
+    <arg name="move_base" default="false"/>
+    <arg name="tuw" default="false"/>
+    <arg name="iteration" default="1"/>
+
+    <include file="$(find uml_hri_nerve_nav_sim_resources)/launch/spawn_world.launch">
+        <arg name="world_path" value="$(arg world_path)/$(arg level).world"/>
+    </include>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/navigation/map_server.launch">
+        <arg name="map_name" value="$(arg level)"/>
+    </include>
+    
+    <group if="$(arg launch_robot)">
+        <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/setup_pioneer_mbf.launch">
+            <arg name="x" value="$(arg x)"/>
+            <arg name="y" value="$(arg y)"/>
+            <arg name="robot_name" value="$(arg robot_name)"/>
+            <arg name="level" value="$(arg level)"/>
+            <arg name="mbf" value="$(arg mbf)"/>
+            <arg name="move_base" value="$(arg move_base)"/>
+            <arg name="tuw" value="$(arg tuw)"/>
+            <arg name="iteration" default="$(arg iteration)"/>
+
+        </include>
+    </group>
+ 
+</launch>

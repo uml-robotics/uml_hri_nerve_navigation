@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="world_name" default="nerve2"/>
+    <arg name="launch_graph_generator" default="true"/>
+    <arg name="cfg" default="default"/>
+    <arg name="load_segments" default="false"/>
+    <arg name="map_name" default=""/>
+    <arg name="mbf" default="true" />
+
+    <group if="$(arg launch_graph_generator)">
+        <group if="$(arg load_segments)">
+            <include file="$(find tuw_multi_robot_demo)/launch/graph_generator.launch">
+                <arg name="cfg" value="$(arg world_name)" />
+                <arg name="custom_graph_path" value="$(find tuw_multi_robot_demo)/cfg/graph/$(arg world_name)/cache/$(arg map_name)" />
+            </include>
+        </group>
+        <group unless="$(arg load_segments)">
+            <include file="$(find tuw_multi_robot_demo)/launch/graph_generator.launch">
+                <arg name="cfg" value="$(arg world_name)" />
+            </include>
+        </group>
+    </group>
+
+    <include file="$(find uml_hri_nerve_navigation)/launch/multiple_robots_testing/tuw/local_controller_recursive_gz.launch">
+        <arg name="mbf" value="$(arg mbf)"/>
+    </include>
+
+    <include file="$(find tuw_multi_robot_demo)/launch/multi_robot_route_planner.launch">
+        <arg name="cfg" value="$(arg cfg)" />
+    </include>
+    
+    <!-- start rviz -->
+    <include file="$(find tuw_multi_robot_demo)/launch/rviz.launch">
+        <arg name="cfg" value="$(arg world_name)"/>
+    </include>
+
+
+</launch>

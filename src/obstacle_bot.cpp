@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Bool.h>
 #include <uml_hri_nerve_navigation/Goal.h>
 #include <std_srvs/Empty.h>
 #include <move_base_msgs/MoveBaseAction.h>
@@ -13,6 +14,7 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 MoveBaseClient *ac;
 ros::ServiceClient costmap_service;
 ros::ServiceClient goal_service;
+ros::Publisher testStatusPub;
 
 void goalCallback(uml_hri_nerve_navigation::Goal goal_msg)
 {
@@ -57,16 +59,24 @@ void goalCallback(uml_hri_nerve_navigation::Goal goal_msg)
 int main(int argc, char **argv)
 {
   // Setup ros node and NodeHandle
-  ros::init(argc, argv, "mover_node");
+  ros::init(argc, argv, "ob_mover_node");
   ros::NodeHandle n;
 
   //Subscribe to the goal topic
-  ros::Subscriber sub = n.subscribe("goal", 10, goalCallback);
+  ros::Subscriber sub = n.subscribe("/goal", 10, goalCallback);
 
-  ac = new MoveBaseClient("move_base", true);
-  costmap_service = n.serviceClient<std_srvs::Empty>("move_base/clear_costmaps");
+//  ros::Publisher testStatusPub = n.advertise<std_msgs::Bool>("/test_status", 1000);
+//  testStatusPub.publish(true);
+
+    testStatusPub = n.advertise<std_msgs::Bool>("/ob_test_status", 1000, true);
+
+  ac = new MoveBaseClient("/obstacle_bot/move_base", true);
+  costmap_service = n.serviceClient<std_srvs::Empty>("/obstacle_bot/move_base/clear_costmaps");
   goal_service = n.serviceClient<std_srvs::Empty>("get_new_goal");
 
+  std_msgs::Bool boolean;
+  boolean.data = true;
+  testStatusPub.publish(boolean);
   //wait for the action server to come up
   while (!ac->waitForServer(ros::Duration(5.0)))
   {
@@ -88,3 +98,4 @@ int main(int argc, char **argv)
 
   return 0;
 }
+
