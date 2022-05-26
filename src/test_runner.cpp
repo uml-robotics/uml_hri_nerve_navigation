@@ -24,7 +24,8 @@
 
 using namespace std;
 using namespace nlohmann;
-
+int flag;
+            
 int iteration = 1;
 
 bool gazebo_active = false;
@@ -243,7 +244,7 @@ public:
         while(ros::master::check());
         cout << "MASTER HAS DIED" << endl << endl;
 
-        reset();
+        // reset();
 
         // pauses the code until any keyboard input is received (not required?)
         int flag;
@@ -372,8 +373,8 @@ public:
         for (int i = 0; i < number_of_robots; ++i){
             // launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
             //                " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
-            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
-                           " y:=" + to_string(yOdom) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
+            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch simulation:=false x:=" + to_string(robots[i].starting_position_x) +
+                           " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
             
             launch_goal_pub = "roslaunch uml_hri_nerve_navigation tester_goal_publisher.launch robot_name:=" + robots[i].robot_namespace + " goal_x:=" +
                               to_string(robots[i].goal_position_x) + " goal_y:=" + to_string(robots[i].goal_position_y) + out;
@@ -422,17 +423,21 @@ public:
         string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
         system(launch_checker.c_str());
         
-        sleep(1);
+        sleep(0.5);
+
         // cout << "Program is paused !\n" <<
         //      "Press Enter to continue\n";
         // flag = getc(stdin);
         // cout << "\nContinuing .";
-        string end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v map | xargs rosnode kill" + out;
+        
+        string end_iteration;
+        
+        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v map | grep -v rviz | xargs rosnode kill" + out;
         system(end_iteration.c_str());
         sleep(1);
         reset_robot();
         
-        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | xargs rosnode kill" + out;
+        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v rviz | xargs rosnode kill" + out;
         system(end_iteration.c_str());
     }
 
@@ -474,7 +479,7 @@ public:
         string launch_goal_pub, launch_robot;
         string robot_reset_goals_str = "";
         for (int i = 0; i < number_of_robots; ++i){
-            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
+            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].goal_position_x) +
                            " y:=" + to_string(robots[i].goal_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" + to_string(iteration) + out;
             system(launch_robot.c_str());
             while (!odom_map[robots[i].robot_namespace]);
@@ -513,7 +518,7 @@ public:
 
 
         // send goals
-        string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch robot_names:=" 
+        string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch r1_goal_x:=0.0 r1_goal_y:=0.0 robot_names:=" 
                                     + robot_names_str + " robot_goals:=" + robot_reset_goals_str + " test:=" + robots[0].nav_config + " num_robots:=" + to_string(number_of_robots) + out;
         system(launch_goal_sender.c_str());
 
@@ -521,7 +526,7 @@ public:
         // checker
         string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
         system(launch_checker.c_str());
-        sleep(1);
+        sleep(0.5);
 
         // cout << "Program is paused !\n" <<
         //     "Press Enter to continue\n";
@@ -546,7 +551,6 @@ public:
             // tester_status = "pause";
 
             sleep(2);
-            // int flag;
             // cout << "Program is paused !\n" <<
             //     "Press Enter to continue\n";
             // flag = getc(stdin);
@@ -592,7 +596,7 @@ int main (int argc, char** argv){
     string file_path = " ", file_name = " ";
     int num_iterations = 2;
 
-    file_name = "nerve2_tuw_mbf_single_robot.json";
+    file_name = "test_1.json";
     file_path = "src/uml_hri_nerve_navigation/test_defs/" + file_name;
 
     fstream file(file_path, ios::in); // file path is in the directory where the executable is
@@ -605,7 +609,7 @@ int main (int argc, char** argv){
 
     //  test_runner.run_in_person_test_repeatedly(2);
     cout << "THE CODE IS RUNNING TILL HERE: 1" << endl;
-    test_runner.run_test_in_person(2);
+    test_runner.run_in_person_test_repeatedly(31);
 
     system("clear");
 

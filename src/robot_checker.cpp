@@ -77,8 +77,8 @@ void checkGoalsReached(vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
         cout << "CHECKER_NODE: ODOM: " << odom_vector[i].pose.pose.position.x << ", GOAL: " << goal_vector[i].pose.position.x << endl;
 
         found = false;
-        if (abs(odom_vector[i].pose.pose.position.x - goal_vector[i].pose.position.x) <= 0.6
-         && abs(odom_vector[i].pose.pose.position.y - goal_vector[i].pose.position.y) <= 0.6
+        if (abs(odom_vector[i].pose.pose.position.x - goal_vector[i].pose.position.x) <= 0.65
+         && abs(odom_vector[i].pose.pose.position.y - goal_vector[i].pose.position.y) <= 0.65
          && abs(odom_vector[i].pose.pose.orientation.w - goal_vector[i].pose.orientation.w) < 0.02) {
             for (int j = 0; j < robots_reached.size(); ++j){
                 if (robots_reached[j] == odom_vector[i].header.frame_id){
@@ -118,7 +118,7 @@ void checkRobotsStuck (vector<nav_msgs::Odometry> odom_vector, vector<geometry_m
             }
             prev_odom_readings[i] = odom_vector[i];
         }
-        if (robots_stuck && seconds >= 60){
+        if (robots_stuck && seconds >= 45){
             cout << "Shutting down the node due to robot(s) being stuck" << endl;
             kill_node = true;
             return;

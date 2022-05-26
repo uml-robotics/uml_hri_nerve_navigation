@@ -192,7 +192,6 @@ public:
     };
 
     void add_velocity(geometry_msgs::Twist cmd_vel){
-        ROS_ERROR("--------------------------------------------------- LOGGER VELOCITY ----------------------------------------------------");
 
         std::fstream velFile;
         velFile.setf(std::ios::fixed);
@@ -208,6 +207,8 @@ public:
     {
         if (navigating && test_active)
         {
+            ROS_ERROR("--------------------------------------------------- LOGGER POSITION ----------------------------------------------------");
+
             //save the position and distance
             log.robot_pos.x = pose.pose.position.x;
             log.robot_pos.y = pose.pose.position.y;

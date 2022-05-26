@@ -98,7 +98,7 @@ void tester_status_subscriber(vector<string> robot_names){
 }
 
 // data structure for a robot
-struct robot{
+struct robot {
     string robot;
     string robot_namespace;
     double starting_position_x;
@@ -111,26 +111,25 @@ typedef struct robot Robot;
 
 class TestRunner{
  public:
-    TestRunner(json json_file){
+    TestRunner(json json_file) {
         map = json_file.at("map").at("map_name");
         world_name = json_file.at("map").at("world_name");
         number_of_robots = json_file.at("robots").at("number_of_robots");
         robots.resize(number_of_robots);
         string robot = "robot_";
-        for (int i = 0, j = 1; j < number_of_robots + 1; ++i, ++j){
+    
+        for (int i = 0, j = 1; j < number_of_robots + 1; ++i, ++j) {
             string robot_name = robot + to_string(j);
             robots[i].robot = json_file.at("robots").at(robot_name).at("robot");
             robots[i].robot_namespace = json_file.at("robots").at(robot_name).at("robot_namespace");
-
             robots[i].starting_position_x = json_file.at("robots").at(robot_name).at("starting_position")[0];
             robots[i].starting_position_y = json_file.at("robots").at(robot_name).at("starting_position").at(1);
-
             robots[i].goal_position_x = json_file.at("robots").at(robot_name).at("goal_position")[0];
             robots[i].goal_position_y = json_file.at("robots").at(robot_name).at("goal_position").at(1);
-
             robots[i].nav_config = json_file.at("robots").at(robot_name).at("nav_config");
         }
-        for (int i = 0; i < robots.size(); ++i){
+    
+        for (int i = 0; i < robots.size(); ++i) {
             robot_names_str += robots[i].robot_namespace;
             robot_goals_str += to_string(robots[i].goal_position_x) + "," + to_string(robots[i].goal_position_y);
             if (i != robots.size() - 1){
@@ -138,6 +137,7 @@ class TestRunner{
                 robot_goals_str += ",";
             }
         }
+    
         xGoal = robots[0].goal_position_x;
         yGoal = robots[0].goal_position_y;
     }
@@ -167,7 +167,7 @@ class TestRunner{
         
             string launch_goal_pub, launch_robot;
             for (int i = 0; i < number_of_robots; ++i){
-                launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(robots[i].starting_position_x) +
+                launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer.launch x:=" + to_string(robots[i].starting_position_x) +
                             " y:=" + to_string(robots[i].starting_position_y) + " robot_name:=" + robots[i].robot_namespace + " iteration:=" 
                             + to_string(num_repetitions) + " config:=" + robots[i].nav_config + out;
 
@@ -238,7 +238,7 @@ class TestRunner{
         }
     }
 
-    vector<string> get_robot_names(){
+    vector<string> get_robot_names() {
         vector<string> temp;
         for (int i = 0; i < robots.size(); ++i){
             temp.push_back(robots[i].robot_namespace);
@@ -268,7 +268,7 @@ class TestRunner{
         string launch_goal_pub, launch_robot;
         string robot_reset_goals_str = "";
         for (int i = 0; i < number_of_robots; ++i){
-            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer_mbf.launch x:=" + to_string(xOdom) +
+            launch_robot = "roslaunch uml_hri_nerve_navigation setup_pioneer.launch x:=" + to_string(xOdom) +
                            " y:=" + to_string(robots[i].goal_position_y) + " robot_name:=" + robots[i].robot_namespace 
                            + " iteration:=" + to_string(num_repetitions) + " config:=" + robots[i].nav_config + out;
             system(launch_robot.c_str());
@@ -309,6 +309,7 @@ class TestRunner{
 
 int main(int argc, char* argv[]) {
     system("roslaunch uml_hri_nerve_navigation start_roscore.launch &");
+    
     ros::init(argc, argv, "automated_navigation_tester");
     ros::NodeHandle nh("~");
 
