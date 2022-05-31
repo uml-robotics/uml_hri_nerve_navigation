@@ -1,0 +1,6 @@
+<launch> 
+    <arg name="robot_names" default="pioneer,pioneer_bot"/>
+    <node name="tester_checker_node" type="tester_checker_node" pkg="uml_hri_nerve_navigation" output="screen">
+            <param name="robot_names" value="$(arg robot_names)"/>
+    </node>
+</launch>

@@ -1,0 +1,16 @@
+<launch>
+
+    <arg name="current_odom_topic" default="rosaria/pose"/>
+    <arg name="filtered_odom_topic" default="pioneer/odom"/>
+    <arg name="offset_x" default="0.0"/>
+    <arg name="offset_y" default="2.72"/>
+
+
+    <node name="odom_filter_node" type="odom_filter_node" pkg="uml_hri_nerve_navigation" output="screen">
+        <param name="odom_topic" value="$(arg current_odom_topic)"/>
+        <param name="filtered_odom_topic" value="$(arg filtered_odom_topic)"/>
+        <param name="offset_x" value="$(arg offset_x)"/>
+        <param name="offset_y" value="$(arg offset_y)"/>
+    </node>
+
+</launch>

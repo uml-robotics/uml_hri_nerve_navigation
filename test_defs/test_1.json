@@ -8,8 +8,8 @@
     "robot_1":{
       "robot": "pioneer",
       "robot_namespace": "pioneer",
-      "starting_position": [0, 0],
-      "goal_position": [0.29, 2.72],
+      "starting_position": [0.29, 2.72],
+      "goal_position": [0.0, 0.0],
       "nav_config": "nav_stack"
     }
   }

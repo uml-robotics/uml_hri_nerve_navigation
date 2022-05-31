@@ -212,6 +212,19 @@ target_link_libraries(ant
   ${catkin_LIBRARIES}
 )
 
+add_executable(tester_checker_node src/tester_checker.cpp)
+add_dependencies(tester_checker_node ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tester_checker_node
+  ${catkin_LIBRARIES}
+)
+
+add_executable(odom_filter_node src/rosaria_odom_filter.cpp)
+add_dependencies(odom_filter_node ${ob_mover_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odom_filter_node
+  ${catkin_LIBRARIES}
+)
+
+
 target_link_libraries(tester_goal_pub_node
   ${catkin_LIBRARIES}
 )

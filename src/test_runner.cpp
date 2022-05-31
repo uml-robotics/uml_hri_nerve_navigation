@@ -420,7 +420,8 @@ public:
 
         
         // launch checker
-        string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        // string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        string launch_checker = "roslaunch uml_hri_nerve_navigation tester_checker.launch robot_names:=" + robot_names_str + "";
         system(launch_checker.c_str());
         
         sleep(0.5);
@@ -432,7 +433,7 @@ public:
         
         string end_iteration;
         
-        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v map | grep -v rviz | xargs rosnode kill" + out;
+        end_iteration = "rosnode list | grep -v rosaria | grep -v rosout | grep -v hokuyo | grep -v test_runner | grep -v rviz | xargs rosnode kill" + out;
         system(end_iteration.c_str());
         sleep(1);
         reset_robot();
@@ -474,6 +475,10 @@ public:
 
         xGoal = robots[0].starting_position_x;
         yGoal = robots[0].starting_position_x;
+
+        string launch_map = "roslaunch uml_hri_nerve_navigation map_server.launch" + out;
+        system(launch_map.c_str());
+        while (!map_active);
 
         // launch goal pub
         string launch_goal_pub, launch_robot;
@@ -518,13 +523,15 @@ public:
 
 
         // send goals
-        string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch r1_goal_x:=0.0 r1_goal_y:=0.0 robot_names:=" 
+        string launch_goal_sender = "roslaunch --log uml_hri_nerve_navigation multiple_robots_test_goal_sender.launch r1_goal_x:=0.29 r1_goal_y:=2.72 robot_names:=" 
                                     + robot_names_str + " robot_goals:=" + robot_reset_goals_str + " test:=" + robots[0].nav_config + " num_robots:=" + to_string(number_of_robots) + out;
         system(launch_goal_sender.c_str());
 
         cout << "----------------------------------- LAUNCHED THE MOVER" << endl;
         // checker
-        string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        // string launch_checker = "roslaunch uml_hri_nerve_navigation robot_checker.launch robot_names:=" + robot_names_str + "";
+        // system(launch_checker.c_str());
+        string launch_checker = "roslaunch uml_hri_nerve_navigation tester_checker.launch robot_names:=" + robot_names_str + "";
         system(launch_checker.c_str());
         sleep(0.5);
 
@@ -609,7 +616,7 @@ int main (int argc, char** argv){
 
     //  test_runner.run_in_person_test_repeatedly(2);
     cout << "THE CODE IS RUNNING TILL HERE: 1" << endl;
-    test_runner.run_in_person_test_repeatedly(31);
+    test_runner.run_in_person_test_repeatedly(3);
 
     system("clear");
 

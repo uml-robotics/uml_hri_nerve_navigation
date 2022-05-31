@@ -1,6 +1,11 @@
 [
 {
   "directory": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"uml_hri_nerve_navigation\\\" -I/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel/include -I/home/csrobot/catkin_ws/devel/.private/tuw_local_controller_msgs/include -I/home/csrobot/catkin_ws/devel/.private/tuw_multi_robot_msgs/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp  -g   -std=c++14 -o CMakeFiles/odom_filter_node.dir/src/rosaria_odom_filter.cpp.o -c /home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/rosaria_odom_filter.cpp",
+  "file": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/rosaria_odom_filter.cpp"
+},
+{
+  "directory": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build",
   "command": "/usr/bin/x86_64-linux-gnu-g++-7  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"uml_hri_nerve_navigation\\\" -I/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel/include -I/home/csrobot/catkin_ws/devel/.private/tuw_local_controller_msgs/include -I/home/csrobot/catkin_ws/devel/.private/tuw_multi_robot_msgs/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp  -g   -std=c++14 -o CMakeFiles/ant.dir/src/automated_navigation_tester.cpp.o -c /home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/automated_navigation_tester.cpp",
   "file": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/automated_navigation_tester.cpp"
 },
@@ -73,6 +78,11 @@
   "directory": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build",
   "command": "/usr/bin/x86_64-linux-gnu-g++-7  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"uml_hri_nerve_navigation\\\" -I/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel/include -I/home/csrobot/catkin_ws/devel/.private/tuw_local_controller_msgs/include -I/home/csrobot/catkin_ws/devel/.private/tuw_multi_robot_msgs/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp  -g   -std=c++14 -o CMakeFiles/move_base_checker_node.dir/src/move_base_checker.cpp.o -c /home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/move_base_checker.cpp",
   "file": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/move_base_checker.cpp"
+},
+{
+  "directory": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build",
+  "command": "/usr/bin/x86_64-linux-gnu-g++-7  -DROSCONSOLE_BACKEND_LOG4CXX -DROS_BUILD_SHARED_LIBS=1 -DROS_PACKAGE_NAME=\\\"uml_hri_nerve_navigation\\\" -I/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build/devel/include -I/home/csrobot/catkin_ws/devel/.private/tuw_local_controller_msgs/include -I/home/csrobot/catkin_ws/devel/.private/tuw_multi_robot_msgs/include -I/opt/ros/melodic/include -I/opt/ros/melodic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp  -g   -std=c++14 -o CMakeFiles/tester_checker_node.dir/src/tester_checker.cpp.o -c /home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/tester_checker.cpp",
+  "file": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/src/tester_checker.cpp"
 },
 {
   "directory": "/home/csrobot/catkin_ws/src/uml_hri_nerve_navigation/build",
